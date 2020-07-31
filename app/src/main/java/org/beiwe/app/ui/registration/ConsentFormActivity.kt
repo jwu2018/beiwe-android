@@ -18,7 +18,7 @@ class ConsentFormActivity : RunningBackgroundServiceActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_consent_form)
-        consent_form_body.text = PersistentData.getConsentFormText()
+        consent_form_body.text = PersistentData.consentFormText
     }
 
     /** On the press of the do not consent button, we pop up an alert, allowing the user
@@ -38,7 +38,7 @@ class ConsentFormActivity : RunningBackgroundServiceActivity() {
     }
 
     fun consentButton(view: View?) {
-        PersistentData.setRegistered(true)
+        PersistentData.isRegistered = true
         PersistentData.loginOrRefreshLogin()
 
         // Download the survey questions and schedule the surveys

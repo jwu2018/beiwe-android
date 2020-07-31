@@ -50,7 +50,7 @@ class CrashHandler(private val errorHandlerContext: Context) : Thread.UncaughtEx
          * @param context An android Context*/
         @JvmStatic
         fun writeCrashlog(exception: Throwable?, context: Context?) {
-            Sentry.getContext().addTag("user_id", PersistentData.getPatientID())
+            Sentry.getContext().addTag("user_id", PersistentData.patientID)
             Sentry.getContext().addTag("server_url", PostRequest.addWebsitePrefix(""))
             Sentry.capture(exception)
         }

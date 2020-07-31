@@ -74,7 +74,7 @@ public class ResetPassword {
 				super.onPostExecute(arg);
 				if (responseCode == 200) {
 					// Set the password on the device to the new permanent password
-					PersistentData.setPassword(newPassword);
+					PersistentData.setThePassword(newPassword);
 					// Set the user to "logged in"
 					PersistentData.loginOrRefreshLogin();
 					// Show a Toast with a "Success!" message

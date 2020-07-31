@@ -109,7 +109,7 @@ class DebugInterfaceActivity : SessionActivity() {
     }
 
     fun printSurveys(view: View?) {
-        val surveyIDs = PersistentData.getSurveyIds()
+        val surveyIDs = PersistentData.surveyIds
         printi("debug", surveyIDs.toString())
         for (survey_id in surveyIDs) {
             printi("survey", survey_id)
@@ -118,7 +118,7 @@ class DebugInterfaceActivity : SessionActivity() {
     }
 
     fun printSurveySettings(view: View) {
-        for (survey_id in PersistentData.getSurveyIds() ){
+        for (survey_id in PersistentData.surveyIds){
             print(survey_id)
             print(PersistentData.getSurveySettings(survey_id));
         }
@@ -152,60 +152,60 @@ class DebugInterfaceActivity : SessionActivity() {
     }
 
     fun logDataToggles(view: View?) {
-        printi("Debug.DataToggles", "Accelerometer: " + PersistentData.getAccelerometerEnabled().toString() )
-        printi("Debug.DataToggles", "Gyroscope: " + PersistentData.getGyroscopeEnabled().toString() )
-        printi("Debug.DataToggles", "GPS: " + PersistentData.getGpsEnabled().toString() )
-        printi("Debug.DataToggles", "Calls: " + PersistentData.getCallsEnabled().toString() )
-        printi("Debug.DataToggles", "Texts: " + PersistentData.getTextsEnabled().toString() )
-        printi("Debug.DataToggles", "WiFi: " + PersistentData.getWifiEnabled().toString() )
-        printi("Debug.DataToggles", "Bluetooth: " + PersistentData.getBluetoothEnabled().toString() )
-        printi("Debug.DataToggles", "Power State: " + PersistentData.getPowerStateEnabled().toString() )
+        printi("Debug.DataToggles", "Accelerometer: " + PersistentData.accelerometerEnabled.toString() )
+        printi("Debug.DataToggles", "Gyroscope: " + PersistentData.gyroscopeEnabled.toString() )
+        printi("Debug.DataToggles", "GPS: " + PersistentData.gpsEnabled.toString() )
+        printi("Debug.DataToggles", "Calls: " + PersistentData.callsEnabled.toString() )
+        printi("Debug.DataToggles", "Texts: " + PersistentData.textsEnabled.toString() )
+        printi("Debug.DataToggles", "WiFi: " + PersistentData.wifiEnabled.toString() )
+        printi("Debug.DataToggles", "Bluetooth: " + PersistentData.bluetoothEnabled.toString() )
+        printi("Debug.DataToggles", "Power State: " + PersistentData.powerStateEnabled.toString() )
     }
 
     fun getAlarmStates(view: View?) {
-        val ids = PersistentData.getSurveyIds()
+        val ids = PersistentData.surveyIds
         for (surveyId in ids) {
             printi("most recent alarm state", "survey id: " + surveyId + ", " + PersistentData.getMostRecentSurveyAlarmTime(surveyId) + ", " + PersistentData.getSurveyNotificationState(surveyId))
         }
     }
 
     fun getEnabledFeatures(view: View?) {
-        if (PersistentData.getAccelerometerEnabled())
+        if (PersistentData.accelerometerEnabled)
             printi("features", "Accelerometer Enabled.")
         else
             printe("features", "Accelerometer Disabled.")
 
-        if (PersistentData.getGyroscopeEnabled())
+        if (PersistentData.gyroscopeEnabled)
             printi("features", "Gyroscope Enabled.")
         else
             printe("features", "Gyroscope Disabled.")
 
-        if (PersistentData.getGpsEnabled())
+        if (PersistentData.gpsEnabled)
             printi("features", "Gps Enabled.")
         else
             printe("features", "Gps Disabled.")
 
-        if (PersistentData.getCallsEnabled())
+        if (PersistentData.callsEnabled)
             printi("features", "Calls Enabled.")
         else
             printe("features", "Calls Disabled.")
 
-        if (PersistentData.getTextsEnabled())
+        if (PersistentData.textsEnabled)
             printi("features", "Texts Enabled.")
         else
             printe("features", "Texts Disabled.")
 
-        if (PersistentData.getWifiEnabled())
+        if (PersistentData.wifiEnabled)
             printi("features", "Wifi Enabled.")
         else
             printe("features", "Wifi Disabled.")
 
-        if (PersistentData.getBluetoothEnabled())
+        if (PersistentData.bluetoothEnabled)
             printi("features", "Bluetooth Enabled.")
         else
             printe("features", "Bluetooth Disabled.")
 
-        if (PersistentData.getPowerStateEnabled())
+        if (PersistentData.powerStateEnabled)
             printi("features", "PowerState Enabled.")
         else
             printe("features", "PowerState Disabled.")
@@ -337,7 +337,7 @@ class DebugInterfaceActivity : SessionActivity() {
     }
 
     fun popSurveyNotifications(view: View?) {
-        for (surveyId in PersistentData.getSurveyIds()) {
+        for (surveyId in PersistentData.surveyIds) {
             SurveyNotifications.displaySurveyNotification(appContext, surveyId)
         }
     }
@@ -475,7 +475,7 @@ class DebugInterfaceActivity : SessionActivity() {
     }
 
     fun clearNotifications(view: View?) {
-        for (surveyId in PersistentData.getSurveyIds())
+        for (surveyId in PersistentData.surveyIds)
             SurveyNotifications.dismissNotification(appContext, surveyId)
     }
 }

@@ -22,14 +22,14 @@ class MainMenuActivity : SessionActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_menu)
 
-        if (PersistentData.getCallClinicianButtonEnabled())
-            main_menu_call_clinician.text = PersistentData.getCallClinicianButtonText()
+        if (PersistentData.callClinicianButtonEnabled)
+            main_menu_call_clinician.text = PersistentData.callClinicianButtonText
         else
             main_menu_call_clinician.visibility = View.GONE
 
         val permSurveyIds = ArrayList<String>()
 
-        for (surveyId in PersistentData.getSurveyIds())
+        for (surveyId in PersistentData.surveyIds)
             try {
                 val surveySettings = JSONObject(PersistentData.getSurveySettings(surveyId))
                 if (surveySettings.getBoolean("always_available"))

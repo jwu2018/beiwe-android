@@ -19,13 +19,13 @@ class PhoneNumberEntryActivity : RunningBackgroundServiceActivity() {
         setContentView(R.layout.activity_phone_number_entry)
 
         val textFieldKeyboard = TextFieldKeyboard(applicationContext)
-        if (PersistentData.getCallClinicianButtonEnabled()) {
+        if (PersistentData.callClinicianButtonEnabled) {
             textFieldKeyboard.makeKeyboardBehave(primaryCareNumber)
         } else {
             primaryCareNumberLabel.visibility = View.GONE
             primaryCareNumber.visibility = View.GONE
         }
-        if (PersistentData.getCallResearchAssistantButtonEnabled()) {
+        if (PersistentData.callResearchAssistantButtonEnabled) {
             textFieldKeyboard.makeKeyboardBehave(passwordResetNumber)
         } else {
             passwordResetNumberLabel.visibility = View.GONE
@@ -36,7 +36,7 @@ class PhoneNumberEntryActivity : RunningBackgroundServiceActivity() {
     fun checkAndPromptConsent(view: View?) {
         val primary = primaryCareNumber.text.toString().replace("\\D+".toRegex(), "")
         val reset = passwordResetNumber.text.toString().replace("\\D+".toRegex(), "")
-        if (PersistentData.getCallClinicianButtonEnabled()) {
+        if (PersistentData.callClinicianButtonEnabled) {
             if (primary == null || primary.length == 0) {
                 AlertsManager.showAlert(getString(R.string.enter_clinician_number), this)
                 return
@@ -46,7 +46,7 @@ class PhoneNumberEntryActivity : RunningBackgroundServiceActivity() {
                 return
             }
         }
-        if (PersistentData.getCallResearchAssistantButtonEnabled()) {
+        if (PersistentData.callResearchAssistantButtonEnabled) {
             if (reset == null || reset.length == 0) {
                 AlertsManager.showAlert(getString(R.string.enter_research_assitant_number), this)
                 return
@@ -56,8 +56,8 @@ class PhoneNumberEntryActivity : RunningBackgroundServiceActivity() {
                 return
             }
         }
-        PersistentData.setPrimaryCareNumber(primary)
-        PersistentData.setPasswordResetNumber(reset)
+        PersistentData.primaryCareNumber = primary
+        PersistentData.passwordResetNumber = reset
         startActivity(Intent(applicationContext, ConsentFormActivity::class.java))
         finish()
     }

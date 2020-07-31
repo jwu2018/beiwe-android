@@ -206,7 +206,7 @@ public class RegisterActivity extends RunningBackgroundServiceActivity {
 				}
 				
 				if (responseCode == 200) {
-					PersistentData.setPassword(newPassword);
+					PersistentData.setThePassword(newPassword);
 
 					if (PersistentData.getCallClinicianButtonEnabled() || PersistentData.getCallResearchAssistantButtonEnabled()) {
 						activity.startActivity(new Intent(activity.getApplicationContext(), PhoneNumberEntryActivity.class));
