@@ -9,6 +9,7 @@ import org.beiwe.app.JSONUtils;
 import org.beiwe.app.R;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.security.SecureRandom;
 import java.util.List;
@@ -407,6 +408,15 @@ public class PersistentData {
 	public static String getPassword() { return pref.getString( KEY_PASSWORD, null ); }
 	public static String getPatientID() { return pref.getString(KEY_ID, NULL_ID); }
 
+	public static void setFirebaseConfig(JSONObject firebaseConfig) { putCommit("firebase_config", firebaseConfig.toString()); }
+	public static JSONObject getFirebaseConfig() {
+		JSONParser parser = new JSONParser();
+		string data = pref.getString("firebase_config", NULL_ID);
+		if (data == (string) NULL_ID){
+			return (JSONObject) parser.parse("");
+		}
+		return (JSONObject) parser.parse(data);
+	}
 	/*###########################################################################################
 	#################################### Contact Numbers ########################################
 	###########################################################################################*/

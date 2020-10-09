@@ -205,6 +205,9 @@ public class PostRequest {
 				writeKey(key, response);
 				JSONObject deviceSettings = responseJSON.getJSONObject("device_settings");
 				SetDeviceSettings.writeDeviceSettings(deviceSettings);
+				JSONObject firebaseData = responseJSON.getJSONObject("android_firebase_json");
+				PersistentData.setFirebaseConfig(firebaseData)
+
 			} catch (JSONException e) {
 				// this gets called once per app lifecycle, always print the error because this is a pain to debug.
 				e.printStackTrace();
