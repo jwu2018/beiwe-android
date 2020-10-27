@@ -408,14 +408,20 @@ public class PersistentData {
 	public static String getPassword() { return pref.getString( KEY_PASSWORD, null ); }
 	public static String getPatientID() { return pref.getString(KEY_ID, NULL_ID); }
 
-	public static void setFirebaseConfig(JSONObject firebaseConfig) { putCommit("firebase_config", firebaseConfig.toString()); }
-	public static JSONObject getFirebaseConfig() throws JSONException {
+	public static void setFirebaseConfig(JSONObject firebaseConfig) {
+		putCommit("firebase_config", firebaseConfig.toString()); }
+	public static JSONObject getFirebaseConfig() {
 		//JSONParser parser = new JSONParser();
 		String data = pref.getString("firebase_config", NULL_ID);
 		if (data == NULL_ID){
 			throw new RuntimeException("no firebase config data stored");
 		}
-		return new JSONObject(data);
+		try {
+			return new JSONObject(data);
+		}
+		catch (JSONException invalid) {
+			throw new RuntimeException("error parsing stored JSON data");
+		}
 	}
 	/*###########################################################################################
 	#################################### Contact Numbers ########################################

@@ -23,6 +23,8 @@ import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 
@@ -42,6 +44,8 @@ import org.beiwe.app.storage.TextFileManager;
 import org.beiwe.app.survey.SurveyScheduler;
 import org.beiwe.app.ui.user.LoginActivity;
 import org.beiwe.app.ui.utils.SurveyNotifications;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Calendar;
 import java.util.List;
@@ -86,9 +90,10 @@ public class BackgroundService extends Service {
 		}
 		
 		PersistentData.initialize( appContext );
-		initializeFireBaseIDToken();
+		//initializeFireBaseIDToken();
 		TextFileManager.initialize( appContext );
 		PostRequest.initialize( appContext );
+		initializeFireBaseIDToken();
 		localHandle = this;  //yes yes, hacky, I know. This line needs to run before registerTimers()
 		registerTimers(appContext);
 		
@@ -232,6 +237,7 @@ public class BackgroundService extends Service {
 	}
 	
 	/** Gets, sets, and pushes the FCM token to the backend. */
+	/*
 	public void initializeFireBaseIDToken () {
 		final String errorMessage =
 			"Unable to get FCM token, will not be able to receive push notifications.";
@@ -277,6 +283,36 @@ public class BackgroundService extends Service {
 				}
 			});
 	}
+	*/
+	public void initializeFireBaseIDToken () {
+		final String errorMessage =
+				"Unable to get FCM token, will not be able to receive push notifications.";
+
+		if (!PersistentData.isRegistered()){
+			return;
+		}
+		JSONObject configData = PersistentData.getFirebaseConfig();
+		String appId = "";
+		String apiKey = "";
+		String databaseUrl = "";
+		String storageBucket = "";
+		try {
+			appId = configData.getJSONObject("project_info").getString("project_id");
+			apiKey = configData.getJSONArray("client").getJSONObject(0).getJSONArray("api_key").getJSONObject(0).getString("current_key");
+			databaseUrl = configData.getJSONObject("project_info").getString("firebase_url");
+			storageBucket = configData.getJSONObject("project_info").getString("beiwe-20592.appspot.com");
+		}
+		catch (JSONException invalid){
+			throw new RuntimeException("formatting error in firebase JSON");
+		}
+		FirebaseOptions.Builder builder = new FirebaseOptions.Builder()
+				.setApplicationId(appId)
+				.setApiKey(apiKey)
+				.setDatabaseUrl(databaseUrl)
+				.setStorageBucket(storageBucket);
+		FirebaseApp.initializeApp(this, builder.build());
+	}
+
 	
 	/*#############################################################################
 	####################            Timer Logic             #######################

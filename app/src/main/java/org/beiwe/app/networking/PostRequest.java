@@ -3,6 +3,7 @@ package org.beiwe.app.networking;
 import android.content.Context;
 import android.util.Log;
 
+import org.beiwe.app.BackgroundService;
 import org.beiwe.app.BuildConfig;
 import org.beiwe.app.CrashHandler;
 import org.beiwe.app.DeviceInfo;
@@ -207,12 +208,13 @@ public class PostRequest {
 				SetDeviceSettings.writeDeviceSettings(deviceSettings);
 				JSONObject firebaseData = responseJSON.getJSONObject("android_firebase_json");
 				PersistentData.setFirebaseConfig(firebaseData);
+				//BackgroundService.initializeFireBaseIDToken();
 
 			} catch (JSONException e) {
 				// this gets called once per app lifecycle, always print the error because this is a pain to debug.
 				e.printStackTrace();
 				PersistentData.setErrorDuringRegistration(true);
-				CrashHandler.writeCrashlog(e, appContext); 
+				CrashHandler.writeCrashlog(e, appContext);
 			}
 		}
 		return response;
