@@ -44,6 +44,7 @@ import org.beiwe.app.storage.TextFileManager;
 import org.beiwe.app.survey.SurveyScheduler;
 import org.beiwe.app.ui.user.LoginActivity;
 import org.beiwe.app.ui.utils.SurveyNotifications;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -70,13 +71,15 @@ public class BackgroundService extends Service {
 	//that code needs to be able to update the IntentFilters associated with timerReceiver.
 	//This is Really Hacky and terrible style, but it is okay because the scheduling code can only ever
 	//begin to run with an already fully instantiated background service.
-	private static BackgroundService localHandle;
-	
+	public static BackgroundService localHandle;
+	//addendum by caleb: this is a class level pointer to the single instance of the object that exists
 	
 	/** onCreate is essentially the constructor for the service, initialize variables here. */
 	@Override
 	public void onCreate() {
 		appContext = this.getApplicationContext();
+		localHandle = this;  //yes yes, hacky, I know. This line needs to run before registerTimers()
+
 		try {
 			String sentryDsn = BuildConfig.SENTRY_DSN;
 			Sentry.init(sentryDsn, new AndroidSentryClientFactory(appContext));
@@ -94,7 +97,6 @@ public class BackgroundService extends Service {
 		TextFileManager.initialize( appContext );
 		PostRequest.initialize( appContext );
 		initializeFireBaseIDToken();
-		localHandle = this;  //yes yes, hacky, I know. This line needs to run before registerTimers()
 		registerTimers(appContext);
 		
 		doSetup();
@@ -237,8 +239,8 @@ public class BackgroundService extends Service {
 	}
 	
 	/** Gets, sets, and pushes the FCM token to the backend. */
-	/*
-	public void initializeFireBaseIDToken () {
+
+	public void initializeFireBaseIDTokenToBackend () {
 		final String errorMessage =
 			"Unable to get FCM token, will not be able to receive push notifications.";
 		
@@ -283,7 +285,7 @@ public class BackgroundService extends Service {
 				}
 			});
 	}
-	*/
+
 	public void initializeFireBaseIDToken () {
 		final String errorMessage =
 				"Unable to get FCM token, will not be able to receive push notifications.";
@@ -300,7 +302,7 @@ public class BackgroundService extends Service {
 			appId = configData.getJSONObject("project_info").getString("project_id");
 			apiKey = configData.getJSONArray("client").getJSONObject(0).getJSONArray("api_key").getJSONObject(0).getString("current_key");
 			databaseUrl = configData.getJSONObject("project_info").getString("firebase_url");
-			storageBucket = configData.getJSONObject("project_info").getString("beiwe-20592.appspot.com");
+			storageBucket = configData.getJSONObject("project_info").getString("storage_bucket");
 		}
 		catch (JSONException invalid){
 			throw new RuntimeException("formatting error in firebase JSON");
@@ -311,6 +313,7 @@ public class BackgroundService extends Service {
 				.setDatabaseUrl(databaseUrl)
 				.setStorageBucket(storageBucket);
 		FirebaseApp.initializeApp(this, builder.build());
+		this.initializeFireBaseIDTokenToBackend();
 	}
 
 	

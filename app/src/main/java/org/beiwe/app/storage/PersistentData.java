@@ -10,6 +10,7 @@ import org.beiwe.app.R;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONStringer;
 
 import java.security.SecureRandom;
 import java.util.List;
@@ -409,10 +410,12 @@ public class PersistentData {
 	public static String getPatientID() { return pref.getString(KEY_ID, NULL_ID); }
 
 	public static void setFirebaseConfig(JSONObject firebaseConfig) {
-		putCommit("firebase_config", firebaseConfig.toString()); }
+		Log.w("json before storing", firebaseConfig.toString());
+		putCommit("firebase_config", firebaseConfig.toString());
+	}
 	public static JSONObject getFirebaseConfig() {
-		//JSONParser parser = new JSONParser();
 		String data = pref.getString("firebase_config", NULL_ID);
+		Log.w("printing json", data);
 		if (data == NULL_ID){
 			throw new RuntimeException("no firebase config data stored");
 		}

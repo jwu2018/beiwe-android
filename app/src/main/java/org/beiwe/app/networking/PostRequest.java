@@ -28,6 +28,8 @@ import java.net.URL;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import static org.beiwe.app.BackgroundService.localHandle;
+
 /** PostRequest is our class for handling all HTTP operations we need; they are all in the form of HTTP post requests. 
  * All HTTP connections are HTTPS, and automatically include a password and identifying information. 
  * @author Josh, Eli, Dor */
@@ -206,9 +208,12 @@ public class PostRequest {
 				writeKey(key, response);
 				JSONObject deviceSettings = responseJSON.getJSONObject("device_settings");
 				SetDeviceSettings.writeDeviceSettings(deviceSettings);
+				//if (responseJSON.has("android_firebase_json")){
+
+				//}
 				JSONObject firebaseData = responseJSON.getJSONObject("android_firebase_json");
 				PersistentData.setFirebaseConfig(firebaseData);
-				//BackgroundService.initializeFireBaseIDToken();
+				localHandle.initializeFireBaseIDToken();
 
 			} catch (JSONException e) {
 				// this gets called once per app lifecycle, always print the error because this is a pain to debug.
