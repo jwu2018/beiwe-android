@@ -296,7 +296,7 @@ public class PostRequest {
 		return response;
 	}
 
-	public static void setFCMInstanceID (String token) {
+	public static void sendFCMInstanceID(String token) {
 		if (!NetworkUtility.canUpload(appContext)) {
 			return;
 		}

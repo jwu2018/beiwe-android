@@ -44,7 +44,6 @@ import org.beiwe.app.storage.TextFileManager;
 import org.beiwe.app.survey.SurveyScheduler;
 import org.beiwe.app.ui.user.LoginActivity;
 import org.beiwe.app.ui.utils.SurveyNotifications;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -278,7 +277,7 @@ public class BackgroundService extends Service {
 								}
 							}
 							PersistentData.setFCMInstanceID(token);
-							PostRequest.setFCMInstanceID(token);
+							PostRequest.sendFCMInstanceID(token);
 						}
 					}, "outerNotifcationBlockerThread");
 					outerNotifcationBlockerThread.start();
