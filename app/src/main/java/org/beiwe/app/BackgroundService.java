@@ -293,11 +293,13 @@ public class BackgroundService extends Service {
 			return;
 		}
 		JSONObject configData = PersistentData.getFirebaseConfig();
+		String projectId = "";
 		String appId = "";
 		String apiKey = "";
 		String databaseUrl = "";
 		String storageBucket = "";
 		try {
+			projectId = configData.getJSONObject("project_info").getString("project_id");
 			appId = configData.getJSONObject("project_info").getString("project_id");
 			apiKey = configData.getJSONArray("client").getJSONObject(0).getJSONArray("api_key").getJSONObject(0).getString("current_key");
 			databaseUrl = configData.getJSONObject("project_info").getString("firebase_url");
@@ -307,7 +309,8 @@ public class BackgroundService extends Service {
 			throw new RuntimeException("formatting error in firebase JSON");
 		}
 		FirebaseOptions.Builder builder = new FirebaseOptions.Builder()
-				.setApplicationId(appId)
+				.setProjectId(projectId)
+				.setApplicationId("org.beiwe.app")
 				.setApiKey(apiKey)
 				.setDatabaseUrl(databaseUrl)
 				.setStorageBucket(storageBucket);
