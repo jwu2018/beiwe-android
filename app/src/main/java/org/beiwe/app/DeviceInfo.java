@@ -76,7 +76,11 @@ public class DeviceInfo {
 	 * 39: app version 2.6.0, Adds optional always-available surveys.
 	 * 41: app version 2.6.1, Adds localization for Traditional Chinese (Taiwan)
 	 * 42: app version 2.6.2, Deletes app data/registration for APK-installed (non-Google Play
-	 *       Store-installed) app  */
+	 *      Store-installed) app
+	 * 43: app version 2.6.3, Fixes permissions request infinite loop in the onnelaLabServer build
+	 *      variant
+	 * 44: app version 3.0.0, Can receive survey push notifications. Upgrades compile SDK target to
+	 *      Android 10. Blocks registration if doesn't download key and app settings. */
 
 	private static String androidID;
 	private static String bluetoothMAC;

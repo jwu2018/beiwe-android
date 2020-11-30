@@ -1,12 +1,18 @@
 package org.beiwe.app;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.PowerManager;
 
+import androidx.annotation.IntDef;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import org.beiwe.app.storage.PersistentData;
 
+import java.lang.annotation.Retention;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,6 +39,7 @@ public class PermissionHandler {
 			permissionMap.put( Manifest.permission.ACCESS_COARSE_LOCATION, 15);
 			permissionMap.put( Manifest.permission.RECEIVE_MMS, 16);
 			permissionMap.put( Manifest.permission.RECEIVE_SMS, 17);
+			permissionMap.put( Manifest.permission.ACCESS_BACKGROUND_LOCATION, 18);
 			permissionMap = Collections.unmodifiableMap(permissionMap); }
 	
 	private static Map <String, Integer> permissionMessages = new HashMap <> ();
@@ -52,6 +59,7 @@ public class PermissionHandler {
 			permissionMessages.put( Manifest.permission.ACCESS_COARSE_LOCATION, R.string.permission_access_coarse_location );
 			permissionMessages.put( Manifest.permission.RECEIVE_MMS, R.string.permission_receive_mms);
 			permissionMessages.put( Manifest.permission.RECEIVE_SMS, R.string.permission_receive_sms);
+			permissionMessages.put( Manifest.permission.ACCESS_BACKGROUND_LOCATION, R.string.permission_access_background_location);
 			permissionMessages = Collections.unmodifiableMap(permissionMessages); }
 
 	public static String getNormalPermissionMessage(String permission, Context appContext) {
@@ -87,6 +95,7 @@ public class PermissionHandler {
 	 *  We will check for microphone recording as a special condition on the audio recording screen. */
 	public static Boolean checkAccessCoarseLocation(Context context) { if ( android.os.Build.VERSION.SDK_INT >= 23) { return context.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PERMISSION_GRANTED; } else { return true; } }
 	public static Boolean checkAccessFineLocation(Context context) { if ( android.os.Build.VERSION.SDK_INT >= 23) { return context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PERMISSION_GRANTED; } else { return true; } }
+	public static Boolean checkAccessBackgroundLocation(Context context) { if ( android.os.Build.VERSION.SDK_INT >= 29) {return context.checkSelfPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PERMISSION_GRANTED; } else { return true; } }
 	public static Boolean checkAccessNetworkState(Context context) { if ( android.os.Build.VERSION.SDK_INT >= 23) { return context.checkSelfPermission(Manifest.permission.ACCESS_NETWORK_STATE) == PERMISSION_GRANTED; } else { return true; } }
 	public static Boolean checkAccessWifiState(Context context) { if ( android.os.Build.VERSION.SDK_INT >= 23) { return context.checkSelfPermission(Manifest.permission.ACCESS_WIFI_STATE) == PERMISSION_GRANTED; } else { return true; } }
 	public static Boolean checkAccessBluetooth(Context context) { if ( android.os.Build.VERSION.SDK_INT >= 23) { return context.checkSelfPermission(Manifest.permission.BLUETOOTH) == PERMISSION_GRANTED; } else { return true; } }
@@ -117,7 +126,8 @@ public class PermissionHandler {
 	
 	public static String getNextPermission(Context context, Boolean includeRecording) {
 		if (PersistentData.getGpsEnabled()) {
-			if ( !checkAccessFineLocation(context) ) { return Manifest.permission.ACCESS_FINE_LOCATION; } }
+			if ( !checkAccessFineLocation(context) ) return Manifest.permission.ACCESS_FINE_LOCATION;
+			if ( !checkAccessBackgroundLocation(context) ) return Manifest.permission.ACCESS_BACKGROUND_LOCATION; }
 		if (PersistentData.getWifiEnabled()) {
 			if ( !checkAccessWifiState(context)) return Manifest.permission.ACCESS_WIFI_STATE;
 			if ( !checkAccessNetworkState(context)) return Manifest.permission.ACCESS_NETWORK_STATE;

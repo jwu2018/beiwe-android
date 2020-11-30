@@ -15,13 +15,13 @@ android {
             storePassword keystoreProperties['storePassword']
         }
     }
-    compileSdkVersion 28
+    compileSdkVersion 29
     defaultConfig {
         applicationId "org.beiwe.app"
         minSdkVersion 16
-        targetSdkVersion 28
-        versionCode 42       //TODO: update this Beiwe version code for new releases
-        versionName '2.6.2'  //TODO: update this Beiwe version number for new releases
+        targetSdkVersion 29
+        versionCode 44       //TODO: update this Beiwe version code for new releases
+        versionName '3.0.0'  //TODO: update this Beiwe version number for new releases
         setProperty("archivesBaseName", "Beiwe-$versionName")
     }
     buildTypes {
@@ -76,7 +76,7 @@ android {
     useLibrary "org.apache.http.legacy"
     sourceSets {
         onnelaLabServer {
-            manifest.srcFile 'src/commStatsCustomUrl/AndroidManifest.xml'
+            manifest.srcFile 'src/textsAndCallsStats/AndroidManifest.xml'
         }
         commStatsCustomUrl {
             manifest.srcFile 'src/textsAndCallsStats/AndroidManifest.xml'
