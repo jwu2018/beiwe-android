@@ -240,49 +240,7 @@ public class BackgroundService extends Service {
 	/** Gets, sets, and pushes the FCM token to the backend. */
 
 	public void initializeFireBaseIDTokenToBackend () {
-		final String errorMessage =
-			"Unable to get FCM token, will not be able to receive push notifications.";
-		
-		// Set up the oncomplete listener for the FCM getter code, then wait until registered
-		// to actually push it to the server or else the post request will error.
-		FirebaseInstanceId.getInstance().getInstanceId()
-			.addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
-				@Override
-				public void onComplete (@NonNull Task<InstanceIdResult> task) {
-					
-					if (!task.isSuccessful()) {
-						Log.e("FCM", errorMessage, task.getException());
-						TextFileManager.writeDebugLogStatement(errorMessage + "(1)");
-						return;
-					}
-					
-					// Get new Instance ID token
-					InstanceIdResult taskResult = task.getResult();
-					if (taskResult == null) {
-						TextFileManager.writeDebugLogStatement(errorMessage + "(2)");
-						return;
-					}
-					
-					//We need to wait until the participant is registered to send the fcm token.
-					final String token = taskResult.getToken();
-					Thread outerNotifcationBlockerThread = new Thread(new Runnable() {
-						@Override
-						public void run () {
-							while (!PersistentData.isRegistered()) {
-								try {
-									Thread.sleep(1000);
-								} catch (InterruptedException ignored) {
-									TextFileManager.writeDebugLogStatement(errorMessage + "(3)");
-									return;
-								}
-							}
-							PersistentData.setFCMInstanceID(token);
-							PostRequest.sendFCMInstanceID(token);
-						}
-					}, "outerNotifcationBlockerThread");
-					outerNotifcationBlockerThread.start();
-				}
-			});
+		return;
 	}
 
 	public void initializeFireBaseIDToken () {
@@ -315,8 +273,39 @@ public class BackgroundService extends Service {
 				.setApiKey(apiKey)
 				.setDatabaseUrl(databaseUrl)
 				.setStorageBucket(storageBucket);
-		FirebaseApp.initializeApp(this, builder.build());
-		this.initializeFireBaseIDTokenToBackend();
+		FirebaseApp app = FirebaseApp.initializeApp(this, builder.build());
+		Log.i("system time before:", String.valueOf(System.currentTimeMillis()));
+		String token = FirebaseInstanceId.getInstance(app).getToken();
+		Log.i("system time after:", String.valueOf(System.currentTimeMillis()));
+		Log.i("token:", String.valueOf(System.currentTimeMillis()));
+		PersistentData.setFCMInstanceID(token);
+		PostRequest.sendFCMInstanceID(token);
+		/*
+		FirebaseInstanceId.getInstance(app).getInstanceId()
+				.addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+					@Override
+					public void onComplete (@NonNull Task<InstanceIdResult> task) {
+
+						if (!task.isSuccessful()) {
+							Log.e("FCM", errorMessage, task.getException());
+							TextFileManager.writeDebugLogStatement(errorMessage + "(1)");
+							return;
+						}
+
+						// Get new Instance ID token
+						InstanceIdResult taskResult = task.getResult();
+						if (taskResult == null) {
+							TextFileManager.writeDebugLogStatement(errorMessage + "(2)");
+							return;
+						}
+
+						final String token = taskResult.getToken();
+						PersistentData.setFCMInstanceID(token);
+						PostRequest.sendFCMInstanceID(token);
+					}
+				});
+
+		 */
 	}
 
 	

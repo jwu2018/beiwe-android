@@ -186,14 +186,6 @@ public class PersistentData {
 
 	public static String getFCMInstanceID() {
 		return pref.getString(FCM_INSTANCE_ID, null); }
-
-	public static void setLastRequestedPermission(String value)  {
-		putCommit(LastRequestedPermission, value);
-	}
-
-	public static String getLastRequestedPermission() {
-		return pref.getString(LastRequestedPermission, "");
-	}
 	
 	/*#####################################################################################
 	################################# Listener Settings ###################################
