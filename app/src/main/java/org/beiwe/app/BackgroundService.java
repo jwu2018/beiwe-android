@@ -258,15 +258,20 @@ public class BackgroundService extends Service {
 		String storageBucket = "";
 		try {
 			projectId = configData.getJSONObject("project_info").getString("project_id");
-			appId = configData.getJSONArray("client").getJSONObject(0).getJSONArray("api_key").getJSONObject(0).getString("current_key");
-			apiKey = configData.getJSONArray("client").getJSONObject(0).getJSONObject("client_info").getString("mobilesdk_app_id");
+			apiKey = configData.getJSONArray("client").getJSONObject(0).getJSONArray("api_key").getJSONObject(0).getString("current_key");
+			appId = configData.getJSONArray("client").getJSONObject(0).getJSONObject("client_info").getString("mobilesdk_app_id");
 			databaseUrl = configData.getJSONObject("project_info").getString("firebase_url");
 			storageBucket = configData.getJSONObject("project_info").getString("storage_bucket");
 		}
 		catch (JSONException invalid){
 			throw new RuntimeException("formatting error in firebase JSON");
 		}
-		Log.i("firebase app", projectId + apiKey + databaseUrl + storageBucket);
+
+		Log.i("firebase projectId", projectId);
+		Log.i("firebase appId", appId);
+		Log.i("firebase apiKey", apiKey);
+		Log.i("firebase databaseUrl", databaseUrl);
+		Log.i("firebase storageBucket", storageBucket);
 		FirebaseOptions.Builder builder = new FirebaseOptions.Builder()
 				.setProjectId(projectId)
 				.setApplicationId(appId)
@@ -280,7 +285,8 @@ public class BackgroundService extends Service {
 		Log.i("token:", String.valueOf(System.currentTimeMillis()));
 		PersistentData.setFCMInstanceID(token);
 		PostRequest.sendFCMInstanceID(token);
-		/*
+
+
 		FirebaseInstanceId.getInstance(app).getInstanceId()
 				.addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
 					@Override
@@ -300,12 +306,14 @@ public class BackgroundService extends Service {
 						}
 
 						final String token = taskResult.getToken();
+						Log.i("firebase token", token);
 						PersistentData.setFCMInstanceID(token);
 						PostRequest.sendFCMInstanceID(token);
 					}
 				});
 
-		 */
+
+
 	}
 
 	
