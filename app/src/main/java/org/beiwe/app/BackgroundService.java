@@ -95,13 +95,13 @@ public class BackgroundService extends Service {
 		//initializeFireBaseIDToken();
 		TextFileManager.initialize( appContext );
 		PostRequest.initialize( appContext );
-		initializeFireBaseIDToken();
 		registerTimers(appContext);
 		
 		doSetup();
 	}
 	
 	public void doSetup () {
+
 		//Accelerometer and power state don't need permissons
 		startPowerStateListener();
 		gpsListener = new GPSListener(appContext); // Permissions are checked in the broadcast receiver
@@ -135,6 +135,7 @@ public class BackgroundService extends Service {
 		if (PersistentData.isRegistered()) {
 			DeviceInfo.initialize(appContext); //if at registration this has already been initialized. (we don't care.)
 			startTimers();
+			initializeFireBaseIDToken();
 		}
 	}
 	
@@ -282,13 +283,6 @@ public class BackgroundService extends Service {
 				.setStorageBucket(storageBucket)
 				.setGcmSenderId(projectNumber);
 		FirebaseApp app = FirebaseApp.initializeApp(this, builder.build());
-		Log.i("system time before:", String.valueOf(System.currentTimeMillis()));
-		String token = FirebaseInstanceId.getInstance(app).getToken();
-		Log.i("system time after:", String.valueOf(System.currentTimeMillis()));
-		Log.i("token:", String.valueOf(System.currentTimeMillis()));
-		PersistentData.setFCMInstanceID(token);
-		PostRequest.sendFCMInstanceID(token);
-
 
 		FirebaseInstanceId.getInstance(app).getInstanceId()
 				.addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
