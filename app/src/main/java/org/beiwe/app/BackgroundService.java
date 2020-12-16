@@ -256,12 +256,14 @@ public class BackgroundService extends Service {
 		String apiKey = "";
 		String databaseUrl = "";
 		String storageBucket = "";
+		String projectNumber = "";
 		try {
 			projectId = configData.getJSONObject("project_info").getString("project_id");
 			apiKey = configData.getJSONArray("client").getJSONObject(0).getJSONArray("api_key").getJSONObject(0).getString("current_key");
 			appId = configData.getJSONArray("client").getJSONObject(0).getJSONObject("client_info").getString("mobilesdk_app_id");
 			databaseUrl = configData.getJSONObject("project_info").getString("firebase_url");
 			storageBucket = configData.getJSONObject("project_info").getString("storage_bucket");
+			projectNumber = configData.getJSONObject("project_info").getString("project_number");
 		}
 		catch (JSONException invalid){
 			throw new RuntimeException("formatting error in firebase JSON");
@@ -277,7 +279,8 @@ public class BackgroundService extends Service {
 				.setApplicationId(appId)
 				.setApiKey(apiKey)
 				.setDatabaseUrl(databaseUrl)
-				.setStorageBucket(storageBucket);
+				.setStorageBucket(storageBucket)
+				.setGcmSenderId(projectNumber);
 		FirebaseApp app = FirebaseApp.initializeApp(this, builder.build());
 		Log.i("system time before:", String.valueOf(System.currentTimeMillis()));
 		String token = FirebaseInstanceId.getInstance(app).getToken();
@@ -311,9 +314,6 @@ public class BackgroundService extends Service {
 						PostRequest.sendFCMInstanceID(token);
 					}
 				});
-
-
-
 	}
 
 	
