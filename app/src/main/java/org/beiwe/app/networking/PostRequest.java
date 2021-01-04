@@ -208,9 +208,6 @@ public class PostRequest {
 				writeKey(key, response);
 				JSONObject deviceSettings = responseJSON.getJSONObject("device_settings");
 				SetDeviceSettings.writeDeviceSettings(deviceSettings);
-				//if (responseJSON.has("android_firebase_json")){
-
-				//}
 				JSONObject firebaseData = responseJSON.getJSONObject("android_firebase_json");
 				PersistentData.setFirebaseConfig(firebaseData);
 				localHandle.initializeFireBaseIDToken();

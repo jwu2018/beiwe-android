@@ -18,6 +18,7 @@ import org.beiwe.app.survey.SurveyAnswersRecorder;
 import org.beiwe.app.survey.SurveyTimingsRecorder;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -238,6 +239,11 @@ public class TextFileManager {
 	 * Initializes all TextFileManager object instances.  Initialization is idempotent.
 	 * @param appContext a Context, provided by the app. */
 	public static synchronized void initialize (Context appContext) {
+		//create an upload file if it does not exist
+		File uploadDir = appContext.getDir("toUpload", Context.MODE_PRIVATE);
+		if (!uploadDir.exists())
+			uploadDir.mkdirs();
+
 		//the key file for encryption (it is persistent and never written to)
 		keyFile = new TextFileManager(
 			appContext, "keyFile", "", true, true, false, false
@@ -333,7 +339,7 @@ public class TextFileManager {
 			if (!PersistentData.isRegistered()) {
 				return false;
 			}
-			this.fileName = PersistentData.getPatientID() + "_" + this.name + "_" + System.currentTimeMillis() + ".csv";
+			this.fileName = "toUpload/" + PersistentData.getPatientID() + "_" + this.name + "_" + System.currentTimeMillis() + ".csv";
 		}
 		
 		try {
@@ -550,6 +556,7 @@ public class TextFileManager {
 	 * DO NOT USE THIS FUNCTION, USE getAllFilesSafely() INSTEAD.
 	 * @return a string array of all files in the app's file directory. */
 	public static synchronized String[] getAllFiles () {
+		//TODO: edit here to account for new dir
 		return appContext.getFilesDir().list();
 	}
 	

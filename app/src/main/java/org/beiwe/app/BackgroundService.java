@@ -92,7 +92,6 @@ public class BackgroundService extends Service {
 		}
 		
 		PersistentData.initialize( appContext );
-		//initializeFireBaseIDToken();
 		TextFileManager.initialize( appContext );
 		PostRequest.initialize( appContext );
 		registerTimers(appContext);
@@ -237,12 +236,7 @@ public class BackgroundService extends Service {
 		for (String surveyId : surveyIds) { filter.addAction(surveyId); }
 		appContext.registerReceiver(localHandle.timerReceiver, filter);
 	}
-	
-	/** Gets, sets, and pushes the FCM token to the backend. */
 
-	public void initializeFireBaseIDTokenToBackend () {
-		return;
-	}
 
 	public void initializeFireBaseIDToken () {
 		final String errorMessage =
@@ -251,30 +245,37 @@ public class BackgroundService extends Service {
 		if (!PersistentData.isRegistered()){
 			return;
 		}
-		JSONObject configData = PersistentData.getFirebaseConfig();
+		JSONObject firebaseConfigData = PersistentData.getFirebaseConfig();
 		String projectId = "";
 		String appId = "";
 		String apiKey = "";
 		String databaseUrl = "";
 		String storageBucket = "";
 		String projectNumber = "";
+		// see https://developers.google.com/android/guides/google-services-plugin#processing_the_json_file for source of these paths
 		try {
-			projectId = configData.getJSONObject("project_info").getString("project_id");
-			apiKey = configData.getJSONArray("client").getJSONObject(0).getJSONArray("api_key").getJSONObject(0).getString("current_key");
-			appId = configData.getJSONArray("client").getJSONObject(0).getJSONObject("client_info").getString("mobilesdk_app_id");
-			databaseUrl = configData.getJSONObject("project_info").getString("firebase_url");
-			storageBucket = configData.getJSONObject("project_info").getString("storage_bucket");
-			projectNumber = configData.getJSONObject("project_info").getString("project_number");
+			projectId = firebaseConfigData.getJSONObject("project_info")
+					.getString("project_id");
+			apiKey = firebaseConfigData.getJSONArray("client")
+					.getJSONObject(0)
+					.getJSONArray("api_key")
+					.getJSONObject(0)
+					.getString("current_key");
+			appId = firebaseConfigData.getJSONArray("client")
+					.getJSONObject(0)
+					.getJSONObject("client_info")
+					.getString("mobilesdk_app_id");
+			databaseUrl = firebaseConfigData.getJSONObject("project_info")
+					.getString("firebase_url");
+			storageBucket = firebaseConfigData.getJSONObject("project_info")
+					.getString("storage_bucket");
+			projectNumber = firebaseConfigData.getJSONObject("project_info")
+					.getString("project_number");
 		}
 		catch (JSONException invalid){
 			throw new RuntimeException("formatting error in firebase JSON");
 		}
 
-		Log.i("firebase projectId", projectId);
-		Log.i("firebase appId", appId);
-		Log.i("firebase apiKey", apiKey);
-		Log.i("firebase databaseUrl", databaseUrl);
-		Log.i("firebase storageBucket", storageBucket);
 		FirebaseOptions.Builder builder = new FirebaseOptions.Builder()
 				.setProjectId(projectId)
 				.setApplicationId(appId)
@@ -303,7 +304,7 @@ public class BackgroundService extends Service {
 						}
 
 						final String token = taskResult.getToken();
-						Log.i("firebase token", token);
+						//Log.i("firebase token", token);
 						PersistentData.setFCMInstanceID(token);
 						PostRequest.sendFCMInstanceID(token);
 					}
