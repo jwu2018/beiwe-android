@@ -67,6 +67,7 @@ public class TextFileManager {
 	private static int GETTER_TIMEOUT = 50; //value is in milliseconds
 	private static String getter_error = "Tried to access %s before calling TextFileManager.start().";
 	private static String broken_getter_error = "Tried to access %s before calling TextFileManager.start(), but the timeout failed.";
+	private static String nonpersistentFolderName = "toUpload";
 	
 	private static void throwGetterError (String sourceName) {
 		throw new NullPointerException(String.format(getter_error, sourceName));
@@ -239,10 +240,12 @@ public class TextFileManager {
 	 * Initializes all TextFileManager object instances.  Initialization is idempotent.
 	 * @param appContext a Context, provided by the app. */
 	public static synchronized void initialize (Context appContext) {
-		//create an upload file if it does not exist
-		File uploadDir = appContext.getDir("toUpload", Context.MODE_PRIVATE);
-		if (!uploadDir.exists())
+		//create an uploads folder if it does not exist
+		File uploadDir = new File(appContext.getFilesDir().getAbsolutePath() + "/" + nonpersistentFolderName);
+		if (!uploadDir.exists()) {
+			//Log.i("initilizing upload dir", "creating upload dir");
 			uploadDir.mkdirs();
+		}
 
 		//the key file for encryption (it is persistent and never written to)
 		keyFile = new TextFileManager(
@@ -339,7 +342,7 @@ public class TextFileManager {
 			if (!PersistentData.isRegistered()) {
 				return false;
 			}
-			this.fileName = "toUpload/" + PersistentData.getPatientID() + "_" + this.name + "_" + System.currentTimeMillis() + ".csv";
+			this.fileName = PersistentData.getPatientID() + "_" + this.name + "_" + System.currentTimeMillis() + ".csv";
 		}
 		
 		try {
@@ -405,7 +408,31 @@ public class TextFileManager {
 	private synchronized void unsafeWritePlaintext (String data) throws FileNotFoundException, IOException {
 		FileOutputStream outStream;
 		//write the output, we always want mode append
-		outStream = appContext.openFileOutput(this.fileName, Context.MODE_APPEND);
+		if(this.persistent) {
+			outStream = appContext.openFileOutput(this.fileName, Context.MODE_APPEND);
+		}
+		else {
+			try {
+				String activeDir = appContext.getFilesDir().getAbsolutePath();
+				//Log.i("we are at directory:", activeDir);
+				//if(new File(activeDir + "/" + nonpersistentFolderName).exists()){
+				//	Log.i("asserted file exists:", new File(activeDir + "/" + nonpersistentFolderName).toString());
+				//}
+				//if(new File(activeDir + "/" + nonpersistentFolderName + "/" + this.fileName).exists()){
+				//	Log.i("asserted file exists:", new File(activeDir + "/" + nonpersistentFolderName  + "/" + this.fileName).toString());
+				//}
+				File toWrite = new File(activeDir + "/" + nonpersistentFolderName + "/" + this.fileName);
+				outStream = new FileOutputStream(toWrite, true);
+			}
+			catch (FileNotFoundException e) {
+				//be careful removing this as it can rapidly flood sentry with errors: one for each failed file write
+				//the safeWritePlaintext function also handles this error but raises it to sentry. This is intentional
+				e.printStackTrace();
+				Log.e("file not found error:", e.getMessage());
+				return;
+			}
+		}
+
 		outStream.write((data).getBytes());
 		outStream.write("\n".getBytes());
 		outStream.flush();
@@ -531,7 +558,7 @@ public class TextFileManager {
 	 * @param fileName */
 	public static synchronized void delete (String fileName) {
 		try {
-			appContext.deleteFile(fileName);
+			new File(fileName).getAbsoluteFile().delete();
 		} catch (Exception e) {
 			Log.e("TextFileManager", "cannot delete file " + fileName);
 			e.printStackTrace();
@@ -557,7 +584,9 @@ public class TextFileManager {
 	 * @return a string array of all files in the app's file directory. */
 	public static synchronized String[] getAllFiles () {
 		//TODO: edit here to account for new dir
-		return appContext.getFilesDir().list();
+		//return appContext.getFilesDir().list();
+		return (new File(appContext.getFilesDir().getAbsolutePath() + "/" + nonpersistentFolderName)).list();
+
 	}
 	
 	/** Returns all data that are not currently in use
@@ -586,8 +615,13 @@ public class TextFileManager {
 		files.remove(TextFileManager.getSurveyAnswersFile().fileName);
 		files.remove(TextFileManager.getSurveyTimingsFile().fileName);
 		files.remove(TextFileManager.getWifiLogFile().fileName);
-		
-		return files.toArray(new String[files.size()]);
+
+		//prepend the upload directory to each file for upload
+		String[] filesArr = files.toArray(new String[files.size()]);
+		for(int i = 0;  i < filesArr.length; i++){
+			filesArr[i] = nonpersistentFolderName + "/" + filesArr[i];
+		}
+		return filesArr;
 	}
 	
 	/*###############################################################################
