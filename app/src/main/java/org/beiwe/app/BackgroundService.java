@@ -245,6 +245,9 @@ public class BackgroundService extends Service {
 		if (!PersistentData.isRegistered()){
 			return;
 		}
+		if (!FirebaseApp.getApps(localHandle).isEmpty()){ //if fireabase is already initialized
+			return;
+		}
 		JSONObject firebaseConfigData = PersistentData.getFirebaseConfig();
 		String projectId = "";
 		String appId = "";
