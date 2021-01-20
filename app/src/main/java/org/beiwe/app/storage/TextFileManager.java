@@ -242,10 +242,7 @@ public class TextFileManager {
 	public static synchronized void initialize (Context appContext) {
 		//create an uploads folder if it does not exist
 		File uploadDir = new File(appContext.getFilesDir().getAbsolutePath() + "/" + nonpersistentFolderName);
-		if (!uploadDir.exists()) {
-			//Log.i("initilizing upload dir", "creating upload dir");
-			uploadDir.mkdirs();
-		}
+		uploadDir.mkdirs();
 
 		//the key file for encryption (it is persistent and never written to)
 		keyFile = new TextFileManager(
@@ -414,21 +411,14 @@ public class TextFileManager {
 		else {
 			try {
 				String activeDir = appContext.getFilesDir().getAbsolutePath();
-				//Log.i("we are at directory:", activeDir);
-				//if(new File(activeDir + "/" + nonpersistentFolderName).exists()){
-				//	Log.i("asserted file exists:", new File(activeDir + "/" + nonpersistentFolderName).toString());
-				//}
-				//if(new File(activeDir + "/" + nonpersistentFolderName + "/" + this.fileName).exists()){
-				//	Log.i("asserted file exists:", new File(activeDir + "/" + nonpersistentFolderName  + "/" + this.fileName).toString());
-				//}
 				File toWrite = new File(activeDir + "/" + nonpersistentFolderName + "/" + this.fileName);
 				outStream = new FileOutputStream(toWrite, true);
 			}
 			catch (FileNotFoundException e) {
-				//be careful removing this as it can rapidly flood sentry with errors: one for each failed file write
-				//the safeWritePlaintext function also handles this error but raises it to sentry. This is intentional
-				e.printStackTrace();
+				//Be careful removing this as it can rapidly flood sentry with errors: one for each failed file write
+				//the safeWritePlaintext function also handles this error but raises it to sentry
 				Log.e("file not found error:", e.getMessage());
+				e.printStackTrace();
 				return;
 			}
 		}
@@ -583,8 +573,6 @@ public class TextFileManager {
 	 * DO NOT USE THIS FUNCTION, USE getAllFilesSafely() INSTEAD.
 	 * @return a string array of all files in the app's file directory. */
 	public static synchronized String[] getAllFiles () {
-		//TODO: edit here to account for new dir
-		//return appContext.getFilesDir().list();
 		return (new File(appContext.getFilesDir().getAbsolutePath() + "/" + nonpersistentFolderName)).list();
 
 	}
