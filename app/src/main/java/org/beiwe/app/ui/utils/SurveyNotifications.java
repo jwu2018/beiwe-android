@@ -220,7 +220,7 @@ public class SurveyNotifications {
 				return;
 			}
 
-			NotificationChannel notificationChannel = new NotificationChannel(CHANNEL_ID, "Survey Notification", NotificationManager.IMPORTANCE_LOW);
+			NotificationChannel notificationChannel = new NotificationChannel(CHANNEL_ID, "Survey Notifications", NotificationManager.IMPORTANCE_LOW);
 
 			// Copied these from an example, these values should change
 			notificationChannel.setDescription("Channel description");

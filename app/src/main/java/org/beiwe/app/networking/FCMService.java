@@ -6,6 +6,7 @@ import com.google.firebase.messaging.RemoteMessage;
 import org.beiwe.app.JSONUtils;
 import org.beiwe.app.storage.PersistentData;
 import org.beiwe.app.storage.TextFileManager;
+import org.beiwe.app.ui.MessagingKt;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -57,7 +58,6 @@ public class FCMService extends FirebaseMessagingService {
 //        if (remoteMessage.getNotification() != null)
 //            printi("FCM", "Message Notification Body: " + remoteMessage.getNotification().getBody());
 //        printi("FCM", "Content: " + data.get("content"));
-        
         if (data.get("type").equals("survey")) {
             // check for surveys first.  This can fail (gracefully), so handle the case where the
             // device does not have a particular survey.
@@ -75,6 +75,10 @@ public class FCMService extends FirebaseMessagingService {
             }
 
             SurveyDownloader.downloadSurveys(getApplicationContext(), notificationSurveyIds);
+        } else if (data.get("type").equals("message")) {
+            printi("FCM", "message content:");
+            printi("FCM", data.get("message"));
+            MessagingKt.displayMessageNotification(getApplicationContext(), data.get("message"));
         }
     }
 }
