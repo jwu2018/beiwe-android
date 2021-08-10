@@ -1,6 +1,5 @@
 package org.beiwe.app.ui
 
-import android.app.Activity
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -12,7 +11,8 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import org.beiwe.app.R
-import org.beiwe.app.session.SessionActivity
+import org.beiwe.app.storage.PersistentData
+import org.beiwe.app.storage.TextFileManager
 import org.beiwe.app.survey.SurveyActivity
 import org.beiwe.app.ui.utils.SurveyNotifications
 
@@ -26,7 +26,7 @@ fun showMessageNotification(appContext: Context, messageContent: String) {
 //    createAndShowNotification(appContext, "New message", messageContent, R.drawable.message_icon)
 }
 
-// TODO: only the last notification stays; the other one seems to get overwritten
+
 fun showSurveyNotification(appContext: Context, surveyId: String) {
     Log.d("JoshLog", "showSurveyNotification()")
     createNotificationChannel(appContext, SURVEYS_CHANNEL_ID,"Survey Notifications", "Surveys and voice recording prompts")
@@ -69,14 +69,15 @@ private fun createAndShowNotification(
     intentAction: String,
     surveyId: String
 ) {
-    // Create Intent
+    val surveyIdHash = surveyId.hashCode()
+    // Create Intent (the Activity to open when the notification gets tapped on)
     var activityIntent = Intent(appContext, destinationActivity)
     activityIntent.action = intentAction  // TODO: is this necessary?
     activityIntent.putExtra("surveyId", surveyId)
     activityIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP //modifies behavior when the user is already in the app
     val pendingActivityIntent = PendingIntent.getActivity(
         appContext,
-        surveyId.hashCode(),
+        surveyIdHash,
         activityIntent,
         PendingIntent.FLAG_CANCEL_CURRENT
     )
@@ -92,8 +93,20 @@ private fun createAndShowNotification(
         .setShowWhen(true)  // Show the timestamp on the notification
         .setSmallIcon(R.mipmap.ic_launcher)
     // Show notification
-    with(NotificationManagerCompat.from(appContext)) {
-        notify(surveyId.hashCode(), notificationBuilder.build())
+    val notificationManager = NotificationManagerCompat.from(appContext)
+    /* Cancel the notification if it exists, then recreate it.  This is because FLAG_UPDATE_CURRENT
+    *  didn't work on API 19. https://stackoverflow.com/a/21250686 */
+    notificationManager.cancel(surveyIdHash)  // Cancel existing identical notification
+    notificationManager.notify(surveyIdHash, notificationBuilder.build())
+    // Save in PersistentData that the notification should be shown (in case the app restarts)
+    PersistentData.setSurveyNotificationState(surveyId, true)
+    // Check if notifications have been disabled, and log it if they are
+    if (!notificationManager.areNotificationsEnabled()) {
+        TextFileManager.getDebugLogFile().writeEncrypted(
+            System.currentTimeMillis()
+                .toString() + " " + "Participant has blocked notifications (1)"
+        )
+        Log.e("SurveyNotifications", "Participant has blocked notifications (1)")
     }
 }
 
