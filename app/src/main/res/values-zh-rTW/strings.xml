@@ -158,9 +158,9 @@
 
     <!-- Notifications -->
     <string name="survey_notification_app_name">Beiwe</string>
-    <string name="new_android_survey_notification_ticker">更新版問卷通知</string>
+    <string name="new_android_survey_notification_title">更新版問卷通知</string>
     <string name="new_android_survey_notification_details">請填寫問卷表格</string>
-    <string name="new_audio_survey_notification_ticker">新增語音紀錄</string>
+    <string name="new_audio_survey_notification_title">新增語音紀錄</string>
     <string name="new_audio_survey_notification_details">請新增語音紀錄</string>
 
     <!-- Menu Items -->

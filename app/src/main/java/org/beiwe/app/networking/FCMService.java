@@ -6,7 +6,7 @@ import com.google.firebase.messaging.RemoteMessage;
 import org.beiwe.app.JSONUtils;
 import org.beiwe.app.storage.PersistentData;
 import org.beiwe.app.storage.TextFileManager;
-import org.beiwe.app.ui.MessagingKt;
+import org.beiwe.app.ui.NotificationsKt;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -78,7 +78,7 @@ public class FCMService extends FirebaseMessagingService {
         } else if (data.get("type").equals("message")) {
             printi("FCM", "message content:");
             printi("FCM", data.get("message"));
-            MessagingKt.displayMessageNotification(getApplicationContext(), data.get("message"));
+            NotificationsKt.showMessageNotification(getApplicationContext(), data.get("message"));
         }
     }
 }

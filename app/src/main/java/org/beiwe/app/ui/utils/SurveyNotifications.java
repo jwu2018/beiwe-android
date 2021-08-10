@@ -20,6 +20,7 @@ import org.beiwe.app.storage.TextFileManager;
 import org.beiwe.app.survey.AudioRecorderActivity;
 import org.beiwe.app.survey.AudioRecorderEnhancedActivity;
 import org.beiwe.app.survey.SurveyActivity;
+import org.beiwe.app.ui.NotificationsKt;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -55,16 +56,22 @@ public class SurveyNotifications {
 	 * Note: the notification can only be dismissed through submitting the survey
 	 * @param appContext */
 	public static void displaySurveyNotification(Context appContext, String surveyId) {
-		//activityIntent contains information on the action triggered by tapping the notification.
+		if (PersistentData.getSurveyType(surveyId).equals("tracking_survey")) {
+			NotificationsKt.showSurveyNotification(appContext, surveyId);
+		} else if (PersistentData.getSurveyType(surveyId).equals("audio_survey")) {
+			NotificationsKt.showVoiceRecordingNotification(appContext, surveyId);
+		}
 
-		Notification.Builder notificationBuilder;
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-			registerSurveyNotificationChannel(appContext);
-			displaySurveyNotificationNew(appContext, surveyId);
-		}
-		else {
-			displaySurveyNotificationOld(appContext, surveyId);
-		}
+			//activityIntent contains information on the action triggered by tapping the notification.
+
+//		Notification.Builder notificationBuilder;
+//		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//			registerSurveyNotificationChannel(appContext);
+//			displaySurveyNotificationNew(appContext, surveyId);
+//		}
+//		else {
+//			displaySurveyNotificationOld(appContext, surveyId);
+//		}
 	}
 
 	/**
@@ -82,7 +89,7 @@ public class SurveyNotifications {
 		if ( PersistentData.getSurveyType(surveyId).equals("tracking_survey" ) ) {
 			activityIntent = new Intent(appContext, SurveyActivity.class);
 			activityIntent.setAction( appContext.getString(R.string.start_tracking_survey) );
-			notificationBuilder.setTicker( appContext.getResources().getString(R.string.new_android_survey_notification_ticker) );
+			notificationBuilder.setTicker( appContext.getResources().getString(R.string.new_android_survey_notification_title) );
 			notificationBuilder.setContentText( appContext.getResources().getString(R.string.new_android_survey_notification_details) );
 			notificationBuilder.setSmallIcon(R.drawable.survey_icon);
 			notificationBuilder.setLargeIcon( BitmapFactory.decodeResource(appContext.getResources(), R.drawable.survey_icon ) );
@@ -91,7 +98,7 @@ public class SurveyNotifications {
 		else if ( PersistentData.getSurveyType(surveyId).equals("audio_survey" ) ) {
 			activityIntent = new Intent( appContext, getAudioSurveyClass(surveyId) );
 			activityIntent.setAction( appContext.getString(R.string.start_audio_survey) );
-			notificationBuilder.setTicker( appContext.getResources().getString(R.string.new_audio_survey_notification_ticker) );
+			notificationBuilder.setTicker( appContext.getResources().getString(R.string.new_audio_survey_notification_title) );
 			notificationBuilder.setContentText( appContext.getResources().getString(R.string.new_audio_survey_notification_details) );
 			notificationBuilder.setSmallIcon( R.drawable.voice_recording_icon );
 			notificationBuilder.setLargeIcon( BitmapFactory.decodeResource(appContext.getResources(), R.drawable.voice_recording_icon) );
@@ -155,7 +162,7 @@ public class SurveyNotifications {
 		if ( PersistentData.getSurveyType(surveyId).equals("tracking_survey" ) ) {
 			activityIntent = new Intent(appContext, SurveyActivity.class);
 			activityIntent.setAction( appContext.getString(R.string.start_tracking_survey) );
-			notificationBuilder.setTicker( appContext.getResources().getString(R.string.new_android_survey_notification_ticker) );
+			notificationBuilder.setTicker( appContext.getResources().getString(R.string.new_android_survey_notification_title) );
 			notificationBuilder.setContentText( appContext.getResources().getString(R.string.new_android_survey_notification_details) );
 			notificationBuilder.setSmallIcon(R.drawable.survey_icon);
 			notificationBuilder.setLargeIcon( BitmapFactory.decodeResource(appContext.getResources(), R.drawable.survey_icon ) );
@@ -164,7 +171,7 @@ public class SurveyNotifications {
 		else if ( PersistentData.getSurveyType(surveyId).equals("audio_survey" ) ) {
 			activityIntent = new Intent( appContext, getAudioSurveyClass(surveyId) );
 			activityIntent.setAction( appContext.getString(R.string.start_audio_survey) );
-			notificationBuilder.setTicker( appContext.getResources().getString(R.string.new_audio_survey_notification_ticker) );
+			notificationBuilder.setTicker( appContext.getResources().getString(R.string.new_audio_survey_notification_title) );
 			notificationBuilder.setContentText( appContext.getResources().getString(R.string.new_audio_survey_notification_details) );
 			notificationBuilder.setSmallIcon( R.drawable.voice_recording_icon );
 			notificationBuilder.setLargeIcon( BitmapFactory.decodeResource(appContext.getResources(), R.drawable.voice_recording_icon) );
