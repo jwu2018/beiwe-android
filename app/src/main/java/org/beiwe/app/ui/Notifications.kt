@@ -32,6 +32,7 @@ fun showSurveyNotification(appContext: Context, surveyId: String) {
     createNotificationChannel(appContext, SURVEYS_CHANNEL_ID,"Survey Notifications", "Surveys and voice recording prompts")
     createAndShowNotification(
         appContext,
+        SURVEYS_CHANNEL_ID,
         SurveyActivity::class.java,
         appContext.getString(R.string.new_android_survey_notification_title),
         appContext.getString(R.string.new_android_survey_notification_details),
@@ -47,6 +48,7 @@ fun showVoiceRecordingNotification(appContext: Context, surveyId: String) {
     createNotificationChannel(appContext, SURVEYS_CHANNEL_ID,"Survey Notifications", "Surveys and voice recording prompts")
     createAndShowNotification(
         appContext,
+        SURVEYS_CHANNEL_ID,
         SurveyNotifications.getAudioSurveyClass(surveyId),
         appContext.getString(R.string.new_audio_survey_notification_title),
         appContext.getString(R.string.new_audio_survey_notification_details),
@@ -59,6 +61,7 @@ fun showVoiceRecordingNotification(appContext: Context, surveyId: String) {
 
 private fun createAndShowNotification(
     appContext: Context,
+    channelId: String,
     destinationActivity: Class<*>,
     title: String,
     content: String,
@@ -78,7 +81,7 @@ private fun createAndShowNotification(
         PendingIntent.FLAG_CANCEL_CURRENT
     )
     // Create NotificationBuilder
-    var notificationBuilder = NotificationCompat.Builder(appContext, MESSAGES_CHANNEL_ID)
+    var notificationBuilder = NotificationCompat.Builder(appContext, channelId)
         .setContentIntent(pendingActivityIntent)
         .setContentText(content)
         .setContentTitle(title)
@@ -90,7 +93,7 @@ private fun createAndShowNotification(
         .setSmallIcon(R.mipmap.ic_launcher)
     // Show notification
     with(NotificationManagerCompat.from(appContext)) {
-        notify(42, notificationBuilder.build())  // TODO: what should the notificationId int be?
+        notify(surveyId.hashCode(), notificationBuilder.build())
     }
 }
 
