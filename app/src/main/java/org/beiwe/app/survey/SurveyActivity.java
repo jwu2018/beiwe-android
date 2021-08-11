@@ -11,8 +11,8 @@ import org.beiwe.app.R;
 import org.beiwe.app.session.SessionActivity;
 import org.beiwe.app.storage.PersistentData;
 import org.beiwe.app.storage.TextFileManager;
+import org.beiwe.app.ui.NotificationsKt;
 import org.beiwe.app.ui.user.MainMenuActivity;
-import org.beiwe.app.ui.utils.SurveyNotifications;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -163,7 +163,7 @@ public class SurveyActivity extends SessionActivity implements
 
 		// Close the Activity
 		startActivity(new Intent(getApplicationContext(), MainMenuActivity.class));
-		SurveyNotifications.dismissNotification(getApplicationContext(), surveyId);
+		NotificationsKt.dismissNotification(getApplicationContext(), surveyId);
 		finish();
 	}
 }

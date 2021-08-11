@@ -17,8 +17,8 @@ import org.beiwe.app.R;
 import org.beiwe.app.session.SessionActivity;
 import org.beiwe.app.storage.AudioFileManager;
 import org.beiwe.app.storage.PersistentData;
+import org.beiwe.app.ui.NotificationsKt;
 import org.beiwe.app.ui.user.MainMenuActivity;
-import org.beiwe.app.ui.utils.SurveyNotifications;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -233,7 +233,7 @@ public class AudioRecorderCommon extends SessionActivity {
 	 * don't need to do anything other than kill the activity.  */
 	public void buttonSavePressed(View v) { //I love the name of this function...
 		if (currentlyRecording) { stopRecording(); }
-		SurveyNotifications.dismissNotification( getApplicationContext(), surveyId );
+		NotificationsKt.dismissNotification(getApplicationContext(), surveyId);
 		startActivity(new Intent(getApplicationContext(), MainMenuActivity.class));
 		finish();
 	}
@@ -298,5 +298,21 @@ public class AudioRecorderCommon extends SessionActivity {
 			enableRecordButton();
 //			Log.d("audio recording", "finished encrypting");
 		}
+	}
+
+
+	/**Tries to determine the type of audio survey.  If it is an Enhanced audio survey AudioRecorderEnhancedActivity.class is returned,
+	 * any other outcome (including an inability to determine type) returns AudioRecorderActivity.class instead. */
+	@SuppressWarnings("rawtypes")
+	public static Class getAudioSurveyClass(String surveyId) {
+		JSONObject surveySettings;
+		try {
+			surveySettings = new JSONObject(PersistentData.getSurveySettings(surveyId));
+			if (surveySettings.getString("audio_survey_type").equals("raw"))
+				return AudioRecorderEnhancedActivity.class;
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return AudioRecorderActivity.class;
 	}
 }

@@ -10,11 +10,13 @@ import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import org.beiwe.app.JSONUtils
 import org.beiwe.app.R
+import org.beiwe.app.printe
 import org.beiwe.app.storage.PersistentData
 import org.beiwe.app.storage.TextFileManager
+import org.beiwe.app.survey.AudioRecorderCommon
 import org.beiwe.app.survey.SurveyActivity
-import org.beiwe.app.ui.utils.SurveyNotifications
 
 
 val MESSAGES_CHANNEL_ID = "messages_notification_channel"
@@ -27,35 +29,61 @@ fun showMessageNotification(appContext: Context, messageContent: String) {
 }
 
 
-fun showSurveyNotification(appContext: Context, surveyId: String) {
-    Log.d("JoshLog", "showSurveyNotification()")
-    createNotificationChannel(appContext, SURVEYS_CHANNEL_ID,"Survey Notifications", "Surveys and voice recording prompts")
-    createAndShowNotification(
-        appContext,
-        SURVEYS_CHANNEL_ID,
-        SurveyActivity::class.java,
-        appContext.getString(R.string.new_android_survey_notification_title),
-        appContext.getString(R.string.new_android_survey_notification_details),
-        R.drawable.survey_icon_large,
-        appContext.getString(R.string.start_tracking_survey),
-        surveyId
-    )
+/**Show notifications for each survey in surveyIds, as long as that survey exists in PersistentData.  */
+fun showAllSurveyNotifications(appContext: Context, surveyIds: List<String>?) {
+    if (surveyIds != null) {
+        val storedSurveyIds = JSONUtils.jsonArrayToStringList(PersistentData.getSurveyIdsJsonArray())
+        for (surveyId in surveyIds) {
+            if (storedSurveyIds.contains(surveyId)) {
+                showSurveyNotification(appContext, surveyId)
+            } else {
+                val errorMsg = "Tried to show notification for survey ID " + surveyId +
+                        " but didn't have that survey stored in PersistentData."
+                printe(errorMsg)
+                TextFileManager.writeDebugLogStatement(errorMsg)
+            }
+        }
+    }
 }
 
 
-fun showVoiceRecordingNotification(appContext: Context, surveyId: String) {
-    Log.d("JoshLog", "showVoiceRecordingNotification()")
-    createNotificationChannel(appContext, SURVEYS_CHANNEL_ID,"Survey Notifications", "Surveys and voice recording prompts")
-    createAndShowNotification(
-        appContext,
-        SURVEYS_CHANNEL_ID,
-        SurveyNotifications.getAudioSurveyClass(surveyId),
-        appContext.getString(R.string.new_audio_survey_notification_title),
-        appContext.getString(R.string.new_audio_survey_notification_details),
-        R.drawable.voice_recording_icon_large,
-        appContext.getString(R.string.start_audio_survey),
-        surveyId
-    )
+fun showSurveyNotification(appContext: Context, surveyId: String) {
+    createNotificationChannel(appContext, SURVEYS_CHANNEL_ID,"Survey Notifications",
+        "Surveys and voice recording prompts")
+    val surveyType = PersistentData.getSurveyType(surveyId)
+    if (surveyType == "tracking_survey") {
+        createAndShowNotification(
+            appContext,
+            SURVEYS_CHANNEL_ID,
+            SurveyActivity::class.java,
+            appContext.getString(R.string.new_android_survey_notification_title),
+            appContext.getString(R.string.new_android_survey_notification_details),
+            R.drawable.survey_icon_large,
+            appContext.getString(R.string.start_tracking_survey),
+            surveyId
+        )
+    } else if (surveyType == "audio_survey") {
+        createAndShowNotification(
+            appContext,
+            SURVEYS_CHANNEL_ID,
+            AudioRecorderCommon.getAudioSurveyClass(surveyId),
+            appContext.getString(R.string.new_audio_survey_notification_title),
+            appContext.getString(R.string.new_audio_survey_notification_details),
+            R.drawable.voice_recording_icon_large,
+            appContext.getString(R.string.start_audio_survey),
+            surveyId
+        )
+    } else {
+        val msg = "encountered unknown survey type: " + surveyType + ", cannot schedule survey."
+        TextFileManager.getDebugLogFile().writeEncrypted(msg)
+    }
+}
+
+
+fun dismissNotification(appContext: Context, surveyId: String) {
+    val notificationManager = NotificationManagerCompat.from(appContext)
+    notificationManager.cancel(surveyId.hashCode())
+    PersistentData.setSurveyNotificationState(surveyId, false)
 }
 
 
@@ -131,12 +159,6 @@ private fun createNotificationChannel(appContext: Context, channelId: String, ch
         val notificationManager: NotificationManager =
             appContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(channel)
-
-        // TODO: decide whether to keep these settings from the old Java code
-//        channel.enableLights(true)
-//        channel.setLightColor(Color.RED)
-//        channel.setVibrationPattern(longArrayOf(0, 1000, 500, 1000))
-//        channel.enableVibration(true)
     }
 }
 

@@ -16,7 +16,6 @@ import org.beiwe.app.storage.PersistentData
 import org.beiwe.app.storage.TextFileManager
 import org.beiwe.app.survey.JsonSkipLogic
 import org.beiwe.app.ui.user.MainMenuActivity
-import org.beiwe.app.ui.utils.SurveyNotifications
 import org.json.JSONArray
 import org.json.JSONException
 import java.security.spec.InvalidKeySpecException
@@ -347,7 +346,7 @@ class DebugInterfaceActivity : SessionActivity() {
 
     fun popSurveyNotifications(view: View?) {
         for (surveyId in PersistentData.getSurveyIds()) {
-            SurveyNotifications.displaySurveyNotification(appContext, surveyId)
+            showSurveyNotification(this, surveyId)
         }
     }
 
@@ -485,6 +484,6 @@ class DebugInterfaceActivity : SessionActivity() {
 
     fun clearNotifications(view: View?) {
         for (surveyId in PersistentData.getSurveyIds())
-            SurveyNotifications.dismissNotification(appContext, surveyId)
+            dismissNotification(this, surveyId)
     }
 }

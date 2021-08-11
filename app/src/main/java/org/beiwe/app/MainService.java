@@ -45,8 +45,8 @@ import org.beiwe.app.networking.SurveyDownloader;
 import org.beiwe.app.storage.PersistentData;
 import org.beiwe.app.storage.TextFileManager;
 import org.beiwe.app.survey.SurveyScheduler;
+import org.beiwe.app.ui.NotificationsKt;
 import org.beiwe.app.ui.user.LoginActivity;
-import org.beiwe.app.ui.utils.SurveyNotifications;
 
 import java.util.Calendar;
 import java.util.List;
@@ -365,8 +365,8 @@ public class MainService extends Service {
 		for (String surveyId : PersistentData.getSurveyIds() ){
 			if ( PersistentData.getSurveyNotificationState(surveyId) || PersistentData.getMostRecentSurveyAlarmTime(surveyId) < now ) {
 				//if survey notification should be active or the most recent alarm time is in the past, trigger the notification.
-				SurveyNotifications.displaySurveyNotification(appContext, surveyId); } }
-		
+				NotificationsKt.showSurveyNotification(appContext, surveyId); } }
+
 		//checks that surveys are actually scheduled, if a survey is not scheduled, schedule it!
 		for (String surveyId : PersistentData.getSurveyIds() ) {
 			if ( !timer.alarmIsSet( new Intent(surveyId) ) ) { SurveyScheduler.scheduleSurvey(surveyId); } }
@@ -526,7 +526,7 @@ public class MainService extends Service {
 			//checks if the action is the id of a survey (expensive), if so pop up the notification for that survey, schedule the next alarm
 			if ( PersistentData.getSurveyIds().contains( broadcastAction ) ) {
 //				Log.i("MAIN SERVICE", "new notification: " + broadcastAction);
-				SurveyNotifications.displaySurveyNotification(appContext, broadcastAction);
+				NotificationsKt.showSurveyNotification(appContext, broadcastAction);
 				SurveyScheduler.scheduleSurvey(broadcastAction);
 				return; }
 

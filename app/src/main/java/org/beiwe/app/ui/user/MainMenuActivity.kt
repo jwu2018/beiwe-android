@@ -8,8 +8,8 @@ import kotlinx.android.synthetic.main.activity_main_menu.*
 import org.beiwe.app.R
 import org.beiwe.app.session.SessionActivity
 import org.beiwe.app.storage.PersistentData
+import org.beiwe.app.survey.AudioRecorderCommon
 import org.beiwe.app.survey.SurveyActivity
-import org.beiwe.app.ui.utils.SurveyNotifications
 import org.json.JSONException
 import org.json.JSONObject
 import java.util.*
@@ -56,7 +56,7 @@ class MainMenuActivity : SessionActivity() {
         val activityIntent: Intent
         val surveyId = view.getTag(R.string.permasurvey) as String
         activityIntent = if (PersistentData.getSurveyType(surveyId) == "audio_survey") {
-            Intent(applicationContext, SurveyNotifications.getAudioSurveyClass(surveyId))
+            Intent(applicationContext, AudioRecorderCommon.getAudioSurveyClass(surveyId))
         } else {
             Intent(applicationContext, SurveyActivity::class.java)
         }

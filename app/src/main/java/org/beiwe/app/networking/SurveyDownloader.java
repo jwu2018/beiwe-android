@@ -9,7 +9,7 @@ import org.beiwe.app.JSONUtils;
 import org.beiwe.app.R;
 import org.beiwe.app.storage.PersistentData;
 import org.beiwe.app.survey.SurveyScheduler;
-import org.beiwe.app.ui.utils.SurveyNotifications;
+import org.beiwe.app.ui.NotificationsKt;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -46,7 +46,7 @@ public class SurveyDownloader {
 		@Override
 		protected void onPostExecute(Void arg) {
 			responseCode = updateSurveys(appContext, jsonResponseString);
-			SurveyNotifications.showSurveyNotifications(appContext, notificationSurveyIds);
+			NotificationsKt.showAllSurveyNotifications(appContext, notificationSurveyIds);
 			super.onPostExecute(arg);
 		} }.execute();
 	}
@@ -142,7 +142,7 @@ public class SurveyDownloader {
 				PersistentData.deleteSurvey(oldSurveyId);
 				//It is almost definitely not worth the effort to cancel any ongoing alarms for a survey. They are one-time, and there is de minimus value to actually cancelling it.
 				// also, that requires accessing the main service, which means using ugly hacks like we do with the survey scheduler (though it would be okay because this code can only actually run if the main service is already instantiated.
-				SurveyNotifications.dismissNotification(appContext, oldSurveyId);
+				NotificationsKt.dismissNotification(appContext, oldSurveyId);
 				MainService.registerTimers(appContext);
 			}
 		}
