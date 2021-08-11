@@ -19,10 +19,6 @@ import org.beiwe.app.survey.AudioRecorderCommon
 import org.beiwe.app.survey.SurveyActivity
 
 
-val MESSAGES_CHANNEL_ID = "messages_notification_channel"
-val SURVEYS_CHANNEL_ID = "survey_notification_channel"
-
-
 fun showMessageNotification(appContext: Context, messageContent: String) {
 //    createNotificationChannel(appContext, "Messages", "Messages from the research staff")
 //    createAndShowNotification(appContext, "New message", messageContent, R.drawable.message_icon)
@@ -48,13 +44,12 @@ fun showAllSurveyNotifications(appContext: Context, surveyIds: List<String>?) {
 
 
 fun showSurveyNotification(appContext: Context, surveyId: String) {
-    createNotificationChannel(appContext, SURVEYS_CHANNEL_ID,"Survey Notifications",
-        "Surveys and voice recording prompts")
+    createNotificationChannel(appContext, NotifChannel.SURVEYS)
     val surveyType = PersistentData.getSurveyType(surveyId)
     if (surveyType == "tracking_survey") {
         createAndShowNotification(
             appContext,
-            SURVEYS_CHANNEL_ID,
+            NotifChannel.SURVEYS.channelId,
             SurveyActivity::class.java,
             appContext.getString(R.string.new_android_survey_notification_title),
             appContext.getString(R.string.new_android_survey_notification_details),
@@ -65,7 +60,7 @@ fun showSurveyNotification(appContext: Context, surveyId: String) {
     } else if (surveyType == "audio_survey") {
         createAndShowNotification(
             appContext,
-            SURVEYS_CHANNEL_ID,
+            NotifChannel.SURVEYS.channelId,
             AudioRecorderCommon.getAudioSurveyClass(surveyId),
             appContext.getString(R.string.new_audio_survey_notification_title),
             appContext.getString(R.string.new_audio_survey_notification_details),
@@ -139,26 +134,35 @@ private fun createAndShowNotification(
 }
 
 
-private fun createNotificationChannel(appContext: Context, channelId: String, channelName: String, descriptionText: String) {
+enum class NotifChannel(val channelId: String, val channelName: String, val descriptionText: String) {
+    SURVEYS("survey_notification_channel", "Survey Notifications",
+        "Surveys and voice recording prompts"),
+    MESSAGES("messages_notification_channel", "Messages",
+        "Messages from the research study administrators")
+}
+
+
+private fun createNotificationChannel(appContext: Context, channel: NotifChannel) {
     // TODO: make Channel an enum https://stackoverflow.com/a/53160059
     val notificationManager =
         appContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     if (notificationManager == null) {
         return
-    } else if (notificationManager.getNotificationChannel(channelId) != null) {
+    } else if (notificationManager.getNotificationChannel(channel.channelId) != null) {
         return
     }
 
     // Only necessary on API 26+ (Android O: that's "Oh", not "Zero")
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         val importance = NotificationManager.IMPORTANCE_LOW
-        val channel = NotificationChannel(channelId, channelName, importance).apply {
-            description = descriptionText
+        val notificationChannel = NotificationChannel(channel.channelId, channel.channelName,
+            importance).apply {
+            description = channel.descriptionText
         }
         // Register the channel with the OS
         val notificationManager: NotificationManager =
             appContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.createNotificationChannel(channel)
+        notificationManager.createNotificationChannel(notificationChannel)
     }
 }
 
