@@ -107,6 +107,9 @@
             android:label="@string/title_activity_consent_form"
             android:screenOrientation="portrait">
         </activity>
+        <activity
+            android:name="org.beiwe.app.ui.MessageActivity"
+            android:label="@string/title_activity_view_message" />
 
         <!-- SERVICE -->
 

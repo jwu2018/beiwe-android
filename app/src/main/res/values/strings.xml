@@ -217,6 +217,7 @@
     <string name="phone_number_length_error"> "Phone numbers must be exactly %d digits long." </string>
     <string name="enter_clinician_number">You must enter a value for the clinician phone </string>
     <string name="enter_research_assitant_number">You must enter a value for the research assistant phone </string>
+
     <!-- Consent Form -->
     <string name="title_activity_consent_form">Consent Form</string>
     <string name="consentButton">I consent</string>
@@ -228,6 +229,9 @@
         Goes\n
         Here.
     </string>
+
+    <!-- View Message Screen -->
+    <string name="title_activity_view_message">View Message</string>
 
     <!-- Survey Settings Keys -->
     <string name="randomize" translatable="false">randomize</string>

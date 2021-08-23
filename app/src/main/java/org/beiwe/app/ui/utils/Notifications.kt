@@ -20,8 +20,19 @@ import org.beiwe.app.survey.SurveyActivity
 
 
 fun showMessageNotification(appContext: Context, messageContent: String) {
-//    createNotificationChannel(appContext, "Messages", "Messages from the research staff")
-//    createAndShowNotification(appContext, "New message", messageContent, R.drawable.message_icon)
+    createNotificationChannel(appContext, NotifChannel.MESSAGES)
+    Log.e("JoshLog", "showMessageNotification")
+    createAndShowNotification(
+        appContext,
+        NotifChannel.MESSAGES.channelId,
+        MessageActivity::class.java,
+        "Message",
+        messageContent,
+        R.drawable.message_icon,
+        "intentActionPlaceholder",
+        "surveyIdPlaceholder",
+        42  // TODO: replace with messageContent.hash or something
+    )
 }
 
 
@@ -45,6 +56,7 @@ fun showAllSurveyNotifications(appContext: Context, surveyIds: List<String>?) {
 
 fun showSurveyNotification(appContext: Context, surveyId: String) {
     createNotificationChannel(appContext, NotifChannel.SURVEYS)
+    val surveyIdHash = surveyId.hashCode()
     val surveyType = PersistentData.getSurveyType(surveyId)
     if (surveyType == "tracking_survey") {
         createAndShowNotification(
@@ -55,7 +67,8 @@ fun showSurveyNotification(appContext: Context, surveyId: String) {
             appContext.getString(R.string.new_android_survey_notification_details),
             R.drawable.survey_icon_large,
             appContext.getString(R.string.start_tracking_survey),
-            surveyId
+            surveyId,
+            surveyIdHash
         )
     } else if (surveyType == "audio_survey") {
         createAndShowNotification(
@@ -66,7 +79,8 @@ fun showSurveyNotification(appContext: Context, surveyId: String) {
             appContext.getString(R.string.new_audio_survey_notification_details),
             R.drawable.voice_recording_icon_large,
             appContext.getString(R.string.start_audio_survey),
-            surveyId
+            surveyId,
+            surveyIdHash
         )
     } else {
         val msg = "encountered unknown survey type: " + surveyType + ", cannot schedule survey."
@@ -90,17 +104,19 @@ private fun createAndShowNotification(
     content: String,
     iconId: Int,
     intentAction: String,
-    surveyId: String
+    surveyId: String?,
+    notificationId: Int,
 ) {
-    val surveyIdHash = surveyId.hashCode()
     // Create Intent (the Activity to open when the notification gets tapped on)
     var activityIntent = Intent(appContext, destinationActivity)
     activityIntent.action = intentAction  // TODO: is this necessary?
-    activityIntent.putExtra("surveyId", surveyId)
+    if (surveyId != null) {
+        activityIntent.putExtra("surveyId", surveyId)
+    }
     activityIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP //modifies behavior when the user is already in the app
     val pendingActivityIntent = PendingIntent.getActivity(
         appContext,
-        surveyIdHash,
+        notificationId,
         activityIntent,
         PendingIntent.FLAG_CANCEL_CURRENT
     )
@@ -119,10 +135,12 @@ private fun createAndShowNotification(
     val notificationManager = NotificationManagerCompat.from(appContext)
     /* Cancel the notification if it exists, then recreate it.  This is because FLAG_UPDATE_CURRENT
     *  didn't work on API 19. https://stackoverflow.com/a/21250686 */
-    notificationManager.cancel(surveyIdHash)  // Cancel existing identical notification
-    notificationManager.notify(surveyIdHash, notificationBuilder.build())
+    notificationManager.cancel(notificationId)  // Cancel existing identical notification
+    notificationManager.notify(notificationId, notificationBuilder.build())
     // Save in PersistentData that the notification should be shown (in case the app restarts)
-    PersistentData.setSurveyNotificationState(surveyId, true)
+    if (surveyId != null) {
+        PersistentData.setSurveyNotificationState(surveyId, true)
+    }
     // Check if notifications have been disabled, and log it if they are
     if (!notificationManager.areNotificationsEnabled()) {
         TextFileManager.getDebugLogFile().writeEncrypted(
@@ -134,7 +152,7 @@ private fun createAndShowNotification(
 }
 
 
-enum class NotifChannel(val channelId: String, val channelName: String, val descriptionText: String) {
+private enum class NotifChannel(val channelId: String, val channelName: String, val descriptionText: String) {
     SURVEYS("survey_notification_channel", "Survey Notifications",
         "Surveys and voice recording prompts"),
     MESSAGES("messages_notification_channel", "Messages",
@@ -143,7 +161,6 @@ enum class NotifChannel(val channelId: String, val channelName: String, val desc
 
 
 private fun createNotificationChannel(appContext: Context, channel: NotifChannel) {
-    // TODO: make Channel an enum https://stackoverflow.com/a/53160059
     val notificationManager =
         appContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     if (notificationManager == null) {
