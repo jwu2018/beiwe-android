@@ -30,7 +30,8 @@ fun showMessageNotification(appContext: Context, messageContent: String) {
         messageContent,
         R.drawable.message_icon,
         "intentActionPlaceholder",
-        "surveyIdPlaceholder",
+        null,
+        messageContent,
         42  // TODO: replace with messageContent.hash or something
     )
 }
@@ -68,6 +69,7 @@ fun showSurveyNotification(appContext: Context, surveyId: String) {
             R.drawable.survey_icon_large,
             appContext.getString(R.string.start_tracking_survey),
             surveyId,
+            null,
             surveyIdHash
         )
     } else if (surveyType == "audio_survey") {
@@ -80,6 +82,7 @@ fun showSurveyNotification(appContext: Context, surveyId: String) {
             R.drawable.voice_recording_icon_large,
             appContext.getString(R.string.start_audio_survey),
             surveyId,
+            null,
             surveyIdHash
         )
     } else {
@@ -105,6 +108,7 @@ private fun createAndShowNotification(
     iconId: Int,
     intentAction: String,
     surveyId: String?,
+    messageContent: String?,
     notificationId: Int,
 ) {
     // Create Intent (the Activity to open when the notification gets tapped on)
@@ -112,6 +116,8 @@ private fun createAndShowNotification(
     activityIntent.action = intentAction  // TODO: is this necessary?
     if (surveyId != null) {
         activityIntent.putExtra("surveyId", surveyId)
+    } else if (messageContent != null) {
+        activityIntent.putExtra("messageContent", messageContent)
     }
     activityIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP //modifies behavior when the user is already in the app
     val pendingActivityIntent = PendingIntent.getActivity(
