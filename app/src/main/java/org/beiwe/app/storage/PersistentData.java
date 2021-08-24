@@ -72,6 +72,7 @@ public class PersistentData {
 	private static final String VOICE_RECORDING_MAX_TIME_LENGTH_SECONDS = "voice_recording_max_time_length_seconds";
 	private static final String WIFI_LOG_FREQUENCY_SECONDS = "wifi_log_frequency_seconds";
 	private static final String SURVEY_IDS = "survey_ids";
+	private static final String MESSAGES_DATA = "messages_data";
 	private static final String LastRequestedPermission = "last_requested_permission";
 //	private static final String SURVEY_QUESTION_IDS = "question_ids";
 
@@ -515,6 +516,17 @@ public class PersistentData {
 	
 	public static void clearSurveyQuestionMemory(String surveyId) {
 		putCommit(surveyId + "-questionIds", new JSONArray().toString() );
+	}
+
+	/*###########################################################################################
+	###################################### Messages #############################################
+	###########################################################################################*/
+
+	public static String getStoredMessages() {
+		return pref.getString(MESSAGES_DATA, "");
+	}
+	public static void setStoredMessages(String messagesData) {
+		putCommit(MESSAGES_DATA, messagesData);
 	}
 
 	/*###########################################################################################

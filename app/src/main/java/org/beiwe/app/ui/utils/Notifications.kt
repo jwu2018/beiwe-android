@@ -12,6 +12,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import org.beiwe.app.JSONUtils
 import org.beiwe.app.R
+import org.beiwe.app.messages.ViewMessageActivity
 import org.beiwe.app.printe
 import org.beiwe.app.storage.PersistentData
 import org.beiwe.app.storage.TextFileManager
@@ -25,7 +26,7 @@ fun showMessageNotification(appContext: Context, messageContent: String) {
     createAndShowNotification(
         appContext,
         NotifChannel.MESSAGES.channelId,
-        MessageActivity::class.java,
+        ViewMessageActivity::class.java,
         "Message",
         messageContent,
         R.drawable.message_icon,

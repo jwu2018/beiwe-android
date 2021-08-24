@@ -108,7 +108,7 @@
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name="org.beiwe.app.ui.MessageActivity"
+            android:name="org.beiwe.app.messages.ViewMessageActivity"
             android:label="@string/title_activity_view_message" />
 
         <!-- SERVICE -->

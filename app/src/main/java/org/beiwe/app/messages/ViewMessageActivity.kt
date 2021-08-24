@@ -1,16 +1,14 @@
-package org.beiwe.app.ui
+package org.beiwe.app.messages
 
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import kotlinx.android.synthetic.main.activity_message.*
+import kotlinx.android.synthetic.main.activity_view_message.*
 import org.beiwe.app.R
 
-class MessageActivity : AppCompatActivity() {
+class ViewMessageActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_message)
+        setContentView(R.layout.activity_view_message)
         val messageContent = intent.getStringExtra("messageContent")
 
         if (messageContent != null) {
