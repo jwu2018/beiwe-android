@@ -40,6 +40,7 @@ import org.beiwe.app.listeners.MMSSentLogger;
 import org.beiwe.app.listeners.PowerStateListener;
 import org.beiwe.app.listeners.SmsSentLogger;
 import org.beiwe.app.listeners.WifiListener;
+import org.beiwe.app.messages.MessagesBackendKt;
 import org.beiwe.app.networking.PostRequest;
 import org.beiwe.app.networking.SurveyDownloader;
 import org.beiwe.app.storage.PersistentData;
@@ -144,6 +145,7 @@ public class MainService extends Service {
 		if (PersistentData.isRegistered()) {
 			DeviceInfo.initialize(appContext); //if at registration this has already been initialized. (we don't care.)
 			startTimers();
+			MessagesBackendKt.showAllMessages(appContext);
 		}
 	}
 

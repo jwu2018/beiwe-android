@@ -36,7 +36,7 @@ public class SurveyActivity extends SessionActivity implements
 		initialViewMoment = System.currentTimeMillis();
 		setContentView(R.layout.activity_survey);
 		Intent triggerIntent = getIntent();
-		surveyId = triggerIntent.getStringExtra("surveyId");
+		surveyId = triggerIntent.getStringExtra("surveyOrMessageId");
 //		if (savedInstanceState == null) {
 //			Bundle extras = getIntent().getExtras();
 //			if (extras != null) {

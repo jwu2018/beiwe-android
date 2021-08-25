@@ -20,20 +20,17 @@ import org.beiwe.app.survey.AudioRecorderCommon
 import org.beiwe.app.survey.SurveyActivity
 
 
-fun showMessageNotification(appContext: Context, messageContent: String) {
+fun showMessageNotification(appContext: Context, messageId: String) {
     createNotificationChannel(appContext, NotifChannel.MESSAGES)
-    Log.e("JoshLog", "showMessageNotification")
     createAndShowNotification(
         appContext,
         NotifChannel.MESSAGES.channelId,
         ViewMessageActivity::class.java,
         "Message",
-        messageContent,
+        "New message from research staff",
         R.drawable.message_icon,
         "intentActionPlaceholder",
-        null,
-        messageContent,
-        42  // TODO: replace with messageContent.hash or something
+        messageId
     )
 }
 
@@ -69,9 +66,7 @@ fun showSurveyNotification(appContext: Context, surveyId: String) {
             appContext.getString(R.string.new_android_survey_notification_details),
             R.drawable.survey_icon_large,
             appContext.getString(R.string.start_tracking_survey),
-            surveyId,
-            null,
-            surveyIdHash
+            surveyId
         )
     } else if (surveyType == "audio_survey") {
         createAndShowNotification(
@@ -82,9 +77,7 @@ fun showSurveyNotification(appContext: Context, surveyId: String) {
             appContext.getString(R.string.new_audio_survey_notification_details),
             R.drawable.voice_recording_icon_large,
             appContext.getString(R.string.start_audio_survey),
-            surveyId,
-            null,
-            surveyIdHash
+            surveyId
         )
     } else {
         val msg = "encountered unknown survey type: " + surveyType + ", cannot schedule survey."
@@ -108,18 +101,13 @@ private fun createAndShowNotification(
     content: String,
     iconId: Int,
     intentAction: String,
-    surveyId: String?,
-    messageContent: String?,
-    notificationId: Int,
+    surveyOrMessageId: String,
 ) {
     // Create Intent (the Activity to open when the notification gets tapped on)
+    val notificationId = surveyOrMessageId.hashCode()
     var activityIntent = Intent(appContext, destinationActivity)
     activityIntent.action = intentAction  // TODO: is this necessary?
-    if (surveyId != null) {
-        activityIntent.putExtra("surveyId", surveyId)
-    } else if (messageContent != null) {
-        activityIntent.putExtra("messageContent", messageContent)
-    }
+    activityIntent.putExtra("surveyOrMessageId", surveyOrMessageId)
     activityIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP //modifies behavior when the user is already in the app
     val pendingActivityIntent = PendingIntent.getActivity(
         appContext,
@@ -132,7 +120,7 @@ private fun createAndShowNotification(
         .setContentIntent(pendingActivityIntent)
         .setContentText(content)
         .setContentTitle(title)
-        .setGroup(surveyId) // This prevents them from replacing the previous notifications
+        .setGroup(surveyOrMessageId) // This prevents them from replacing the previous notifications
         .setLargeIcon(BitmapFactory.decodeResource(appContext.resources, iconId))
         .setOngoing(true)  // Prevent the notification from being swiped away
         .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -145,8 +133,8 @@ private fun createAndShowNotification(
     notificationManager.cancel(notificationId)  // Cancel existing identical notification
     notificationManager.notify(notificationId, notificationBuilder.build())
     // Save in PersistentData that the notification should be shown (in case the app restarts)
-    if (surveyId != null) {
-        PersistentData.setSurveyNotificationState(surveyId, true)
+    if (destinationActivity == SurveyActivity::class.java) {
+        PersistentData.setSurveyNotificationState(surveyOrMessageId, true)
     }
     // Check if notifications have been disabled, and log it if they are
     if (!notificationManager.areNotificationsEnabled()) {

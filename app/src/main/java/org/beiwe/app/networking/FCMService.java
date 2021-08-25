@@ -77,10 +77,7 @@ public class FCMService extends FirebaseMessagingService {
 
             SurveyDownloader.downloadSurveys(getApplicationContext(), notificationSurveyIds);
         } else if (data.get("type").equals("message")) {
-            printi("FCM", "message content:");
-            printi("FCM", data.get("message"));
-            MessagesBackendKt.addNewMessage(data.get("message"));
-            NotificationsKt.showMessageNotification(getApplicationContext(), data.get("message"));
+            MessagesBackendKt.handleNewMessage(data.get("message"), getApplicationContext());
         }
     }
 }
