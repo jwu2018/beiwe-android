@@ -189,4 +189,5 @@
 
     <!-- View Message Screen -->
     <string name="title_activity_view_message">閱讀消息</string>
+    <string name="delete_message_button_text">刪除</string>
 </resources>

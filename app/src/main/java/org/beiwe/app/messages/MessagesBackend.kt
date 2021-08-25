@@ -1,10 +1,10 @@
 package org.beiwe.app.messages
 
 import android.content.Context
-import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import org.beiwe.app.storage.PersistentData
+import org.beiwe.app.ui.dismissNotification
 import org.beiwe.app.ui.showMessageNotification
 import java.util.*
 
@@ -20,7 +20,7 @@ private fun getStoredMessages(): MutableMap<String, StoredMessage> {
 }
 
 
-fun getStoredMessage(messageId: String): StoredMessage? {
+fun getStoredMessage(messageId: String?): StoredMessage? {
     val storedMessages = getStoredMessages()
     return storedMessages[messageId]
 }
@@ -34,15 +34,22 @@ fun showAllMessages(appContext: Context) {
 }
 
 
+fun deleteMessage(messageId: String?, appContext: Context) {
+    if (messageId != null) {
+        val storedMessageData = getStoredMessages()
+        storedMessageData.remove(messageId)
+        PersistentData.setStoredMessages(GSON.toJson(storedMessageData).toString())
+        dismissNotification(appContext, messageId, false)
+    }
+}
+
+
 fun handleNewMessage(messageContent: String, appContext: Context) {
     // Add the message to the dict of messages stored in JSON in PersistentData
     val storedMessages = getStoredMessages()
     val newMessageId = UUID.randomUUID().toString()
     storedMessages[newMessageId] = StoredMessage(messageContent, "about now")
-    val newJson = GSON.toJson(storedMessages)
-    Log.i("JoshLog", "newMessagesJson:")
-    Log.i("JoshLog", newJson.toString())
-    PersistentData.setStoredMessages(newJson.toString())
+    PersistentData.setStoredMessages(GSON.toJson(storedMessages).toString())
     // Show the message
     showMessageNotification(appContext, newMessageId)
 }

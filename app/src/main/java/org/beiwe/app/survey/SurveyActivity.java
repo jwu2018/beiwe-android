@@ -163,7 +163,7 @@ public class SurveyActivity extends SessionActivity implements
 
 		// Close the Activity
 		startActivity(new Intent(getApplicationContext(), MainMenuActivity.class));
-		NotificationsKt.dismissNotification(getApplicationContext(), surveyId);
+		NotificationsKt.dismissNotification(getApplicationContext(), surveyId, true);
 		finish();
 	}
 }

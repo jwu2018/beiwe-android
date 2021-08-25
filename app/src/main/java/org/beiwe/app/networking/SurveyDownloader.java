@@ -142,7 +142,7 @@ public class SurveyDownloader {
 				PersistentData.deleteSurvey(oldSurveyId);
 				//It is almost definitely not worth the effort to cancel any ongoing alarms for a survey. They are one-time, and there is de minimus value to actually cancelling it.
 				// also, that requires accessing the main service, which means using ugly hacks like we do with the survey scheduler (though it would be okay because this code can only actually run if the main service is already instantiated.
-				NotificationsKt.dismissNotification(appContext, oldSurveyId);
+				NotificationsKt.dismissNotification(appContext, oldSurveyId, true);
 				MainService.registerTimers(appContext);
 			}
 		}

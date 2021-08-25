@@ -12,6 +12,11 @@
             android:id="@+id/messageScreenTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
+        
+        <Button
+            style="@style/ViewMessageButtonStyle"
+            android:onClick="deleteMessage"
+            android:text="@string/delete_message_button_text" />
 
     </LinearLayout>
 </ScrollView>

@@ -233,7 +233,7 @@ public class AudioRecorderCommon extends SessionActivity {
 	 * don't need to do anything other than kill the activity.  */
 	public void buttonSavePressed(View v) { //I love the name of this function...
 		if (currentlyRecording) { stopRecording(); }
-		NotificationsKt.dismissNotification(getApplicationContext(), surveyId);
+		NotificationsKt.dismissNotification(getApplicationContext(), surveyId, true);
 		startActivity(new Intent(getApplicationContext(), MainMenuActivity.class));
 		finish();
 	}

@@ -484,6 +484,6 @@ class DebugInterfaceActivity : SessionActivity() {
 
     fun clearNotifications(view: View?) {
         for (surveyId in PersistentData.getSurveyIds())
-            dismissNotification(this, surveyId)
+            dismissNotification(this, surveyId, true)
     }
 }

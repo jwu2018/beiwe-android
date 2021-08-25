@@ -55,7 +55,6 @@ fun showAllSurveyNotifications(appContext: Context, surveyIds: List<String>?) {
 
 fun showSurveyNotification(appContext: Context, surveyId: String) {
     createNotificationChannel(appContext, NotifChannel.SURVEYS)
-    val surveyIdHash = surveyId.hashCode()
     val surveyType = PersistentData.getSurveyType(surveyId)
     if (surveyType == "tracking_survey") {
         createAndShowNotification(
@@ -86,10 +85,12 @@ fun showSurveyNotification(appContext: Context, surveyId: String) {
 }
 
 
-fun dismissNotification(appContext: Context, surveyId: String) {
+fun dismissNotification(appContext: Context, surveyOrMessageId: String, survey: Boolean) {
     val notificationManager = NotificationManagerCompat.from(appContext)
-    notificationManager.cancel(surveyId.hashCode())
-    PersistentData.setSurveyNotificationState(surveyId, false)
+    notificationManager.cancel(surveyOrMessageId.hashCode())
+    if (survey) {
+        PersistentData.setSurveyNotificationState(surveyOrMessageId, false)
+    }
 }
 
 
