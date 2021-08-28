@@ -8,11 +8,11 @@
         android:layout_height="wrap_content"
         android:orientation="vertical" >
 
-        <TextView
-            android:id="@+id/messageScreenTextView"
-            android:layout_width="wrap_content"
+        <org.beiwe.app.survey.MarkDownTextView
+            android:id="@+id/messageContentTextView"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content" />
-        
+
         <Button
             style="@style/ViewMessageButtonStyle"
             android:onClick="deleteMessage"

@@ -9,14 +9,14 @@ import org.beiwe.app.R
 class ViewMessageActivity : AppCompatActivity() {
     var messageId: String? = null
 
-    
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_message)
         messageId = intent.getStringExtra("surveyOrMessageId")
         val message = getStoredMessage(messageId)
         if (message != null) {
-            messageScreenTextView.text = message.content
+            messageContentTextView.setText(message.content)
         }
     }
 
