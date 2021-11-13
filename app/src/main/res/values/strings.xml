@@ -232,7 +232,7 @@
 
     <!-- View Message Screen -->
     <string name="title_activity_view_message">View Message</string>
-    <string name="delete_message_button_text">Delete</string>
+    <string name="delete_message_button_text">Acknowledge and Delete</string>
 
     <!-- Survey Settings Keys -->
     <string name="randomize" translatable="false">randomize</string>
