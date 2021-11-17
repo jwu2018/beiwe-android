@@ -91,6 +91,7 @@ public class DeviceInfo {
 	 *      commStatsCustomUrl versions; not in googlePlayStore version
 	 * 51: app version 3.1.3, Silences the persistent data collection notification
 	 * 58: app version 3.2.0, Receives messages
+	 * 59: app version 3.2.1, Styles messages, targets SDK 30 (Android 11)
 	 * */
 
 	private static String androidID;
