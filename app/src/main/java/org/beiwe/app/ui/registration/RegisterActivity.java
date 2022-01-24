@@ -14,6 +14,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -32,7 +33,6 @@ import org.beiwe.app.ui.utils.AlertsManager;
 
 import static org.beiwe.app.networking.PostRequest.addWebsitePrefix;
 
-
 /**Activity used to log a user in to the application for the first time. This activity should only be called on ONCE,
  * as once the user is logged in, data is saved on the phone.
  * @author Dor Samet, Eli Jones, Josh Zagorsky */
@@ -47,6 +47,7 @@ public class RegisterActivity extends RunningBackgroundServiceActivity {
 
 	private final static int PERMISSION_CALLBACK = 0; //This callback value can be anything, we are not really using it
 	private final static int REQUEST_PERMISSIONS_IDENTIFIER = 1500;
+	private static final String TAG = "RegisterActivity";
 	
 	Handler handler;
 	RegisterActivity self;
@@ -92,6 +93,8 @@ public class RegisterActivity extends RunningBackgroundServiceActivity {
 		String newPassword = newPasswordInput.getText().toString();
 		String confirmNewPassword = confirmNewPasswordInput.getText().toString();
 
+		Log.i(TAG, "register button pressed");
+
 		if ((serverUrl.length() == 0) && (BuildConfig.CUSTOMIZABLE_SERVER_URL)) {
 			// If the study URL is empty, alert the user
 			AlertsManager.showAlert(getString(R.string.url_too_short), getString(R.string.couldnt_register), this);
@@ -126,6 +129,9 @@ public class RegisterActivity extends RunningBackgroundServiceActivity {
 		new HTTPUIAsync(url, currentActivity ) {
 			@Override
 			protected Void doInBackground(Void... arg0) {
+				Log.i(TAG, "trying to register with server");
+				Log.i(TAG, "website URL: " + url);
+
 				DeviceInfo.initialize(currentActivity.getApplicationContext());
 				// Always use anonymized hashing when first registering the phone.
 				parameters= PostRequest.makeParameter("bluetooth_id", DeviceInfo.getBluetoothMAC() ) +
@@ -170,6 +176,7 @@ public class RegisterActivity extends RunningBackgroundServiceActivity {
 			@Override
 			protected void onPostExecute(Void arg) {
 				super.onPostExecute(arg);
+				Log.i(TAG, "on post execute");
 				if (responseCode == 200) {
 					PersistentData.setPassword(newPassword);
 
@@ -181,8 +188,10 @@ public class RegisterActivity extends RunningBackgroundServiceActivity {
 					}
 					activity.finish();
 				} else {
+					Log.e(TAG, responseCode + "can't register");
 					AlertsManager.showAlert(responseCode, currentActivity.getString(R.string.couldnt_register), currentActivity);
 				}
+				Log.i(TAG, "done trying to register with server");
 			}
 		};
 	}
@@ -256,18 +265,25 @@ public class RegisterActivity extends RunningBackgroundServiceActivity {
 	@Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		// Log.i("reg", "onActivityResult. requestCode: " + requestCode + ", resultCode: " + resultCode );
+		super.onActivityResult(requestCode, resultCode, data);
 		aboutToResetFalseActivityReturn = true;
-    }
+	}
 
 	@Override
 	public void onRequestPermissionsResult (int requestCode, String[] permissions, int[] grantResults) {
 		// Log.i("reg", "onRequestPermissionResult");
-		if (activityNotVisible) return; //this is identical logical progression to the way it works in SessionActivity.
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+		if (activityNotVisible)
+			return; //this is identical logical progression to the way it works in SessionActivity.
 		for (int i = 0; i < grantResults.length; i++) {
-			if ( permissions[i].equals( Manifest.permission.READ_SMS ) ) {
+			if (permissions[i].equals(Manifest.permission.READ_SMS)) {
 //				Log.i("permiss", "permission return: " + permissions[i]);
-				if ( grantResults[i] == PermissionHandler.PERMISSION_GRANTED ) { break; }
-				if ( shouldShowRequestPermissionRationale(permissions[i]) ) { showPostPermissionAlert(this); } //(shouldShow... "This method returns true if the app has requested this permission previously and the user denied the request.")
+				if (grantResults[i] == PermissionHandler.PERMISSION_GRANTED) {
+					break;
+				}
+				if (shouldShowRequestPermissionRationale(permissions[i])) {
+					showPostPermissionAlert(this);
+				} //(shouldShow... "This method returns true if the app has requested this permission previously and the user denied the request.")
 			}
 //			else { Log.w("permiss", "permission return: " + permissions[i]); }
 		}

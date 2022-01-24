@@ -27,8 +27,9 @@ import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.iid.InstanceIdResult;
+//import com.google.firebase.iid.FirebaseInstanceId;
+//import com.google.firebase.iid.InstanceIdResult;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.beiwe.app.listeners.AccelerometerListener;
 import org.beiwe.app.listeners.AmbientAudioListener;
@@ -263,47 +264,92 @@ public class MainService extends Service {
 	public void initializeFireBaseIDToken () {
 		final String errorMessage =
 			"Unable to get FCM token, will not be able to receive push notifications.";
+
+		// Set up the oncomplete listener for the FCM getter code, then wait until registered
+		// to actually push it to the server or else the post request will error.
+		FirebaseMessaging.getInstance().getToken()
+				.addOnCompleteListener(new OnCompleteListener<String>() {
+					@Override
+					public void onComplete(@NonNull Task<String> task) {
+						if (!task.isSuccessful()) {
+							Log.e("FCM", errorMessage, task.getException());
+							TextFileManager.writeDebugLogStatement(errorMessage + "(1)");
+							return;
+						}
+
+						// Get new FCM registration token
+						String token = task.getResult();
+//						if (taskResult == null) {
+//							TextFileManager.writeDebugLogStatement(errorMessage + "(2)");
+//							return;
+//						}
+//
+//						// Log and toast
+//						String msg = getString(R.string.msg_token_fmt, taskResult);
+//						Log.d(TAG, msg);
+//						Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
+
+						//We need to wait until the participant is registered to send the fcm token.
+//						final String token = taskResult.getToken();
+						Thread outerNotifcationBlockerThread = new Thread(new Runnable() {
+							@Override
+							public void run () {
+								while (!PersistentData.isRegistered()) {
+									try {
+										Thread.sleep(1000);
+									} catch (InterruptedException ignored) {
+										TextFileManager.writeDebugLogStatement(errorMessage + "(3)");
+										return;
+									}
+								}
+								PersistentData.setFCMInstanceID(token);
+								PostRequest.setFCMInstanceID(token);
+							}
+						}, "outerNotifcationBlockerThread");
+						outerNotifcationBlockerThread.start();
+					}
+				});
 		
 		// Set up the oncomplete listener for the FCM getter code, then wait until registered
 		// to actually push it to the server or else the post request will error.
-		FirebaseInstanceId.getInstance().getInstanceId()
-			.addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
-				@Override
-				public void onComplete (@NonNull Task<InstanceIdResult> task) {
-					
-					if (!task.isSuccessful()) {
-						Log.e("FCM", errorMessage, task.getException());
-						TextFileManager.writeDebugLogStatement(errorMessage + "(1)");
-						return;
-					}
-					
-					// Get new Instance ID token
-					InstanceIdResult taskResult = task.getResult();
-					if (taskResult == null) {
-						TextFileManager.writeDebugLogStatement(errorMessage + "(2)");
-						return;
-					}
-					
-					//We need to wait until the participant is registered to send the fcm token.
-					final String token = taskResult.getToken();
-					Thread outerNotifcationBlockerThread = new Thread(new Runnable() {
-						@Override
-						public void run () {
-							while (!PersistentData.isRegistered()) {
-								try {
-									Thread.sleep(1000);
-								} catch (InterruptedException ignored) {
-									TextFileManager.writeDebugLogStatement(errorMessage + "(3)");
-									return;
-								}
-							}
-							PersistentData.setFCMInstanceID(token);
-							PostRequest.setFCMInstanceID(token);
-						}
-					}, "outerNotifcationBlockerThread");
-					outerNotifcationBlockerThread.start();
-				}
-			});
+//		FirebaseInstanceId.getInstance().getInstanceId()
+//			.addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+//				@Override
+//				public void onComplete (@NonNull Task<InstanceIdResult> task) {
+//
+//					if (!task.isSuccessful()) {
+//						Log.e("FCM", errorMessage, task.getException());
+//						TextFileManager.writeDebugLogStatement(errorMessage + "(1)");
+//						return;
+//					}
+//
+//					// Get new Instance ID token
+//					InstanceIdResult taskResult = task.getResult();
+//					if (taskResult == null) {
+//						TextFileManager.writeDebugLogStatement(errorMessage + "(2)");
+//						return;
+//					}
+//
+//					//We need to wait until the participant is registered to send the fcm token.
+//					final String token = taskResult.getToken();
+//					Thread outerNotifcationBlockerThread = new Thread(new Runnable() {
+//						@Override
+//						public void run () {
+//							while (!PersistentData.isRegistered()) {
+//								try {
+//									Thread.sleep(1000);
+//								} catch (InterruptedException ignored) {
+//									TextFileManager.writeDebugLogStatement(errorMessage + "(3)");
+//									return;
+//								}
+//							}
+//							PersistentData.setFCMInstanceID(token);
+//							PostRequest.setFCMInstanceID(token);
+//						}
+//					}, "outerNotifcationBlockerThread");
+//					outerNotifcationBlockerThread.start();
+//				}
+//			});
 	}
 	
 	/*#############################################################################
@@ -405,6 +451,7 @@ public class MainService extends Service {
 	 * Note: every condition has a return statement at the end; this is because the trigger survey notification
 	 * action requires a fairly expensive dive into PersistantData JSON unpacking.*/
 	private BroadcastReceiver timerReceiver = new BroadcastReceiver() {
+		@SuppressLint("LongLogTag")
 		@Override public void onReceive(Context appContext, Intent intent) {
 			Log.d("BackgroundService - timers", "Received broadcast: " + intent.toString() );
 			TextFileManager.getDebugLogFile().writeEncrypted(System.currentTimeMillis() + " Received Broadcast: " + intent.toString() );

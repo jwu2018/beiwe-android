@@ -35,6 +35,8 @@ import javax.net.ssl.HttpsURLConnection;
 public class PostRequest {
 	private static Context appContext;
 
+	private static final String TAG = "PostRequest";
+
 	/**Uploads must be initialized with an appContext before they can access the wifi state or upload a _file_. */
 	private PostRequest( Context applicationContext ) { appContext = applicationContext; }
 
@@ -142,6 +144,7 @@ public class PostRequest {
 	 * @return a new HttpsURLConnection with common settings */
 	private static HttpsURLConnection setupHTTP( String parameters, URL url, String newPassword ) throws IOException {
 		HttpsURLConnection connection = minimalHTTP(url);
+		Log.i(TAG, "connection before request: " + connection.toString());
 
 		DataOutputStream request = new DataOutputStream( connection.getOutputStream() );
 		request.write( securityParameters(newPassword).getBytes() );
@@ -195,6 +198,10 @@ public class PostRequest {
 	private static int doRegisterRequest(String parameters, URL url) throws IOException {
 		HttpsURLConnection connection = setupHTTP(parameters, url, null);
 		int response = connection.getResponseCode();
+
+		Log.i(TAG, "connection after request: " + connection.toString());
+		Log.i(TAG, response + ": register request");
+
 		if ( response == 200 ) {
 			String responseBody = readResponse(connection);
 			try {
